@@ -1,0 +1,127 @@
+[
+    {
+        "name": "Pull Up",
+        "category": "Upper Body",
+        "type": "Calisthenics",
+        "muscles": [
+            "Back",
+            "Biceps"
+        ]
+    },
+    {
+        "name": "Chin Up",
+        "category": "Upper Body",
+        "type": "Calisthenics",
+        "muscles": [
+            "Back",
+            "Biceps"
+        ]
+    },
+    {
+        "name": "Muscle Up",
+        "category": "Upper Body",
+        "type": "Calisthenics",
+        "muscles": [
+            "Back",
+            "Chest",
+            "Shoulders",
+            "Arms"
+        ]
+    },
+    {
+        "name": "Dip",
+        "category": "Upper Body",
+        "type": "Calisthenics",
+        "muscles": [
+            "Chest",
+            "Triceps",
+            "Shoulders"
+        ]
+    },
+    {
+        "name": "Push Up",
+        "category": "Upper Body",
+        "type": "Calisthenics",
+        "muscles": [
+            "Chest",
+            "Triceps",
+            "Shoulders",
+            "Core"
+        ]
+    },
+    {
+        "name": "Bench Press",
+        "category": "Upper Body",
+        "type": "Weighted",
+        "muscles": [
+            "Chest",
+            "Triceps",
+            "Shoulders"
+        ]
+    },
+    {
+        "name": "Overhead Press",
+        "category": "Upper Body",
+        "type": "Weighted",
+        "muscles": [
+            "Shoulders",
+            "Triceps"
+        ]
+    },
+    {
+        "name": "Lateral Raise",
+        "category": "Upper Body",
+        "type": "Weighted",
+        "muscles": [
+            "Shoulders"
+        ]
+    },
+    {
+        "name": "Cable Row",
+        "category": "Upper Body",
+        "type": "Weighted",
+        "muscles": [
+            "Back",
+            "Biceps"
+        ]
+    },
+    {
+        "name": "Lat Pulldown",
+        "category": "Upper Body",
+        "type": "Weighted",
+        "muscles": [
+            "Lats",
+            "Biceps"
+        ]
+    },
+    {
+        "name": "Squat",
+        "category": "Lower Body",
+        "type": "Weighted",
+        "muscles": [
+            "Quads",
+            "Glutes",
+            "Hamstrings"
+        ]
+    },
+    {
+        "name": "Deadlift",
+        "category": "Full Body",
+        "type": "Weighted",
+        "muscles": [
+            "Back",
+            "Glutes",
+            "Hamstrings",
+            "Core"
+        ]
+    },
+    {
+        "name": "Hanging Leg Raise",
+        "category": "Core",
+        "type": "Calisthenics",
+        "muscles": [
+            "Core",
+            "Hip Flexors"
+        ]
+    }
+]
