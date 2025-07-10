@@ -146,8 +146,8 @@ const Workouts = () => {
         return `${day}.${month}.${year}`;
     };
     return (
-        <div className=" bg-gray-800 p-2 rounded-xl shadow-lg">
-            <h2 className="text-2xl font-bold mb-4 text-green-400 text-center">Treeni Historia</h2>
+        <div className="max-w-2xl mx-auto mt-8 bg-gray-800 p-6 rounded-xl shadow-lg">
+            <h2 className="text-2xl font-bold mb-4 text-green-400 text-center">Treenit</h2>
             {workouts.map(w => (
                 <div key={w.id} className="bg-gray-900 rounded-xl shadow p-3 border border-gray-700 mb-6">
                     <div className="flex justify-between items-center mb-3">
