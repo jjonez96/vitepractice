@@ -11,8 +11,8 @@ function App() {
         <nav className="flex items-center gap-4 px-6 py-4 bg-gray-950 shadow mb-8">
           <Dumbbell className="w-7 h-7 text-green-400 mr-2" />
 
-          <Link to="/" className="hover:underline text-gray-100">Workouts</Link>
-          <Link to="/workout" className="hover:underline text-gray-100">New Workout</Link>
+          <Link to="/" className="hover:underline text-gray-100">Treenit</Link>
+          <Link to="/workout" className="hover:underline text-gray-100">Uusi Treeni</Link>
         </nav>
         <Routes>
           <Route path="/" element={<Workouts />} />
