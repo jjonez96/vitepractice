@@ -12,7 +12,7 @@ export default defineConfig({
         short_name: 'Salitreenit',
         start_url: '/',
         display: 'standalone',
-        background_color: '#ffffff',
+        background_color: '#000000',
         theme_color: '#2563eb',
         icons: [
           {
