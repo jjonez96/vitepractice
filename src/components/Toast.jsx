@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-const Toast = ({ message, type = 'error', isVisible, onClose, duration = 4000 }) => {
+const Toast = ({ message, type = 'error', isVisible, onClose, duration = 2000 }) => {
     useEffect(() => {
         if (isVisible) {
             const timer = setTimeout(() => {

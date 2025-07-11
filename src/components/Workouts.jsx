@@ -159,7 +159,7 @@ const Workouts = () => {
     };
 
     if (loading) return <div className="text-stone-300 text-center">Ladataan...</div>;
-    if (!workouts.length) return <div className="text-stone-300"><h2 className="text-2xl text-white-400 text-center font-bold mb-4">Ei merkattuja treenejä</h2></div>;
+    if (!workouts.length) return <div className="text-stone-300"><h2 className="text-2xl text-white text-center font-bold pt-20">Ei merkattuja treenejä</h2></div>;
 
     // Helper to format yyyy-mm-dd to dd.mm.yyyy
     const formatFinnishDate = (isoDate) => {
@@ -187,7 +187,7 @@ const Workouts = () => {
                                     <h3 className="text-lg font-bold mb-2 text-white">Haluatko poistaa tämän treenin?</h3>
                                     <div className="flex justify-center gap-4 mt-2">
                                         <button
-                                            className="hover:text-white text-red-400 duration-500 border border-red-600 hover:border-white rounded px-4 py-2 text-sm shadow flex items-center justify-center gap-1"
+                                            className="hover:text-red-700 text-red-600 duration-500 border border-red-600 hover:border-red-700 rounded px-4 py-2 text-sm shadow flex items-center justify-center gap-1"
                                             onClick={() => handleDeleteWorkout(confirmDeleteId)}
                                         >
                                             <Trash2 size={15} />
