@@ -234,7 +234,7 @@ const Workouts = () => {
                                 </button>
                             )}
                     </div>
-                    <div className="overflow-x-auto">
+                    <div className="border border-stone-700 rounded-lg overflow-hidden">
                         <table className="w-full text-xs table-auto ">
                             <thead>
                                 <tr className="bg-black text-stone-100 border-b border-green-600">
@@ -245,10 +245,10 @@ const Workouts = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {(editingWorkoutId === w.id ? editSets : setsByWorkout[w.id] || []).map((s, i) => (
+                                {(editingWorkoutId === w.id ? editSets : setsByWorkout[w.id] || []).map((s, i, arr) => (
                                     <tr
                                         key={s.id ? `id-${s.id}` : `new-${i}`}
-                                        className={`bg-black hover:bg-stone-900 transition-colors border-b border-stone-700 ${editingWorkoutId === w.id ? 'cursor-pointer' : ''}`}
+                                        className={`bg-black hover:bg-stone-900 transition-colors ${i < arr.length - 1 ? 'border-b border-stone-700' : ''} ${editingWorkoutId === w.id ? 'cursor-pointer' : ''}`}
                                         onClick={() => editingWorkoutId === w.id && handleRowClick(i)}
                                     >
                                         <td className="px-4 py-3 text-center">{s.exercise}</td>
@@ -261,9 +261,9 @@ const Workouts = () => {
                         </table>
                     </div>
                     {editingWorkoutId === w.id && (
-                        <div className="mt-2 space-y-4">
+                        <div className="mt-6 space-y-4">
                             {editingRowIdx !== null && editSets[editingRowIdx] ? (
-                                <div className="bg-black border border-stone-700 rounded-lg p-4 flex flex-col gap-3 relative shadow">
+                                <div className="bg-black border border-green-900 rounded-lg p-4 flex flex-col relative shadow">
                                     <ExerciseSelector
                                         idx={editingRowIdx}
                                         set={editSets[editingRowIdx]}
@@ -284,10 +284,10 @@ const Workouts = () => {
                                         <button
                                             type="button"
                                             onClick={() => handleDeleteSet(editingRowIdx)}
-                                            className="text-red-400 font-bold text-2xl absolute top-0 right-2 z-10 hover:text-red-600"
+                                            className="hover:text-red-700 text-red-600 duration-500   rounded absolute top-1 right-2 z-10 hover:text-red-600"
                                             aria-label="Remove exercise"
                                         >
-                                            ×
+                                            <X size={25} />
                                         </button>
                                     )}
                                 </div>
@@ -295,7 +295,9 @@ const Workouts = () => {
                                 null
                             )
                             }
-                            <NewExercise addExercise={handleAddRow} />
+                            <div className="pb-2">
+                                <NewExercise addExercise={handleAddRow} />
+                            </div>
                         </div>
                     )}
                     {editingWorkoutId !== w.id && (w.note) && (
@@ -308,7 +310,7 @@ const Workouts = () => {
                     {editingWorkoutId === w.id && (
                         <div className="mt-2 ">
                             <textarea
-                                className="w-full min-h-[60px] bg-black border border-stone-700 rounded p-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-stone-400"
+                                className="w-full min-h-[60px] bg-black border border-stone-700 rounded-lg p-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-stone-400"
                                 placeholder="Lisää muistiinpano tähän..."
                                 value={noteByWorkout[w.id]}
                                 onChange={e => setNoteByWorkout(prev => ({ ...prev, [w.id]: e.target.value }))}
@@ -331,7 +333,6 @@ const Workouts = () => {
 
                 </div>
             ))}
-
             <Toast
                 message={toast.message}
                 type={toast.type}

@@ -7,7 +7,7 @@ import ExerciseInputs from "./ExerciseInputs";
 import NewExercise from "./NewExercise";
 import Toast from "./Toast";
 import { useToast } from "../hooks/useToast";
-import { Save } from "lucide-react";
+import { Save, X } from "lucide-react";
 const NewWorkout = ({ onSaved }) => {
     const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
     const [saving, setSaving] = useState(false);
@@ -83,17 +83,19 @@ const NewWorkout = ({ onSaved }) => {
                                         <button
                                             type="button"
                                             onClick={() => removeSet(idx)}
-                                            className="text-red-400 font-bold text-2xl absolute top-0 right-2 z-10 hover:text-red-600"
+                                            className="hover:text-red-700 text-red-600 duration-500   rounded absolute top-1 right-2 z-10 hover:text-red-600"
                                             aria-label="Remove exercise"
                                         >
-                                            ×
+                                            <X size={25} />
                                         </button>
                                     )}
                                 </div>
                             );
                         })}
                     </div>
-                    <NewExercise addExercise={addExercise} />
+                    <div className="pt-6">
+                        <NewExercise addExercise={addExercise} />
+                    </div>
                 </div>
                 <button type="submit" disabled={saving} className=" text-green-400 duration-500 border border-green-600 hover:border-green-400 text-sm py-2 rounded-lg font-bold w-full flex items-center justify-center gap-2">
                     {saving ? (
