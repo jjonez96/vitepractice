@@ -1,0 +1,39 @@
+const ExerciseInputs = ({ idx, set, handleSetChange }) => {
+    return (
+        <div className="flex flex-row gap-3 flex-wrap">
+            <div className="flex flex-col min-w-[20px] flex-1">
+                <label className="block text-sm mb-1">Sarjat</label>
+                <input
+                    type="number"
+                    min="0"
+                    value={set.sets}
+                    onChange={e => handleSetChange(idx, "sets", e.target.value)}
+                    className="border border-stone-700 bg-black text-gray-100 px-2 py-1 w-full text-center rounded"
+                    required
+                />
+            </div>
+            <div className="flex flex-col min-w-[20px] flex-1">
+                <label className="block text-sm mb-1">Toistot</label>
+                <input
+                    type="number"
+                    min="0"
+                    value={set.reps}
+                    onChange={e => handleSetChange(idx, "reps", e.target.value)}
+                    className="border border-stone-700 bg-black text-gray-100 px-2 py-1 w-full text-center rounded"
+                />
+            </div>
+            <div className="flex flex-col min-w-[20px] flex-1">
+                <label className="block text-sm mb-1">Paino(kg)</label>
+                <input
+                    type="number"
+                    min="0"
+                    value={set.weight}
+                    onChange={e => handleSetChange(idx, "weight", e.target.value)}
+                    className="border border-stone-700 bg-black text-gray-100 px-2 py-1 w-full text-center rounded"
+                />
+            </div>
+        </div>
+    );
+};
+
+export default ExerciseInputs;

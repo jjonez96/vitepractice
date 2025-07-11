@@ -6,13 +6,12 @@ import "./App.css";
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100">
+    <div className="min-h-screen text-gray-100">
       <Router>
-        <nav className="flex items-center gap-4 px-6 py-4 bg-gray-950 shadow mb-8">
-          <Dumbbell className="w-7 h-7 text-green-400 mr-2" />
-
-          <Link to="/" className="hover:underline text-gray-100">Treenit</Link>
-          <Link to="/workout" className="hover:underline text-gray-100">Uusi Treeni</Link>
+        <nav className="flex items-center gap-2 px-3 py-2 bg-black border-b border-stone-700 shadow ">
+          <Dumbbell className="w-7 h-7 text-green-500 mr-2" />
+          <Link to="/" className="hover:text-slate-100  hover:bg-[#1d1d1d] hover: rounded-md text-stone-300 duration-500 click:text-white p-2 focus:bg-[#1d1d1d] ">Treenit</Link>
+          <Link to="/workout" className="hover:text-slate-100  hover:bg-[#1d1d1d] hover: rounded-md text-stone-300 duration-500 click:text-white p-2 focus:bg-[#1d1d1d]">Uusi Treeni</Link>
         </nav>
         <Routes>
           <Route path="/" element={<Workouts />} />

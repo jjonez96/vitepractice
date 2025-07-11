@@ -1,282 +1,290 @@
 [
     {
         "name": "Leuanveto",
+        "name_en": "Pull-up",
         "type": "Calisthenics",
-        "muscle": "Yläkroppa"
+        "muscle": "Selkä"
     },
     {
         "name": "Myötäote leuanveto",
+        "name_en": "Chin-up",
         "type": "Calisthenics",
-        "muscle": "Yläkroppa"
+        "muscle": "Selkä"
     },
     {
-        "name": "Muscle up",
+        "name": "Palomies punnerrus",
+        "name_en": "Muscle up",
         "type": "Calisthenics",
-        "muscle": "Yläkroppa"
+        "muscle": "Selkä, ojentajat"
     },
     {
         "name": "Dippi",
+        "name_en": "Dip",
         "type": "Calisthenics",
-        "muscle": "Yläkroppa"
+        "muscle": "Ojentajat, rinta"
     },
     {
         "name": "Punnerrus",
+        "name_en": "Push-up",
         "type": "Calisthenics",
-        "muscle": "Yläkroppa"
+        "muscle": "Rinta"
     },
     {
         "name": "Penkkipunnerrus",
+        "name_en": "Bench press",
         "type": "Weighted",
-        "muscle": "Yläkroppa"
+        "muscle": "Rinta"
     },
     {
         "name": "Vinopenkki",
+        "name_en": "Incline bench press",
         "type": "Weighted",
-        "muscle": "Yläkroppa"
+        "muscle": "Rinta"
     },
     {
         "name": "Pystypunnerrus",
+        "name_en": "Overhead press",
         "type": "Weighted",
-        "muscle": "Yläkroppa"
+        "muscle": "Olkapäät"
     },
     {
         "name": "Vipunostot sivulle",
+        "name_en": "Lateral raise",
         "type": "Weighted",
-        "muscle": "Yläkroppa"
+        "muscle": "Olkapäät"
     },
     {
         "name": "Kulmasoutu",
+        "name_en": "Bent-over row",
         "type": "Weighted",
-        "muscle": "Yläkroppa"
+        "muscle": "Selkä"
     },
     {
         "name": "Alatalja",
+        "name_en": "Seated row",
         "type": "Weighted",
-        "muscle": "Yläkroppa"
+        "muscle": "Selkä"
     },
     {
         "name": "Ylätalja",
+        "name_en": "Lat pulldown",
         "type": "Weighted",
-        "muscle": "Yläkroppa"
+        "muscle": "Selkä"
     },
     {
         "name": "Kyykky",
+        "name_en": "Squat",
         "type": "Weighted",
-        "muscle": "Alakroppa"
+        "muscle": "Jalat (etureidet, pakarat)"
+    },
+    {
+        "name": "Hack Kyykky",
+        "name_en": "Hack Squat",
+        "type": "Weighted",
+        "muscle": "Etureidet"
     },
     {
         "name": "Maastaveto",
+        "name_en": "Deadlift",
         "type": "Weighted",
-        "muscle": "Yläkroppa"
+        "muscle": "Selkä, takareidet"
     },
     {
         "name": "Jalkaprässi",
+        "name_en": "Leg press",
         "type": "Weighted",
-        "muscle": "Alakroppa"
+        "muscle": "Jalat (etureidet, pakarat)"
     },
     {
         "name": "Jalkojen ojennus",
+        "name_en": "Leg extension",
         "type": "Weighted",
-        "muscle": "Alakroppa"
+        "muscle": "Etureidet"
     },
     {
         "name": "Jalkojen koukistus",
+        "name_en": "Leg curl",
         "type": "Weighted",
-        "muscle": "Alakroppa"
+        "muscle": "Takareidet"
     },
     {
         "name": "Pohjenousu",
+        "name_en": "Calf raise",
         "type": "Weighted",
-        "muscle": "Alakroppa"
+        "muscle": "Pohkeet"
     },
     {
         "name": "Hauiskääntö",
+        "name_en": "Bicep curl",
         "type": "Weighted",
-        "muscle": "Kädet"
+        "muscle": "Hauikset"
     },
     {
         "name": "Ranskalainen punnerrus",
+        "name_en": "Skull crusher",
         "type": "Weighted",
-        "muscle": "Kädet"
+        "muscle": "Ojentajat"
     },
     {
         "name": "Vatsarutistus",
+        "name_en": "Crunch",
         "type": "Calisthenics",
-        "muscle": "Keskivartalo"
+        "muscle": "Vatsalihakset"
     },
     {
         "name": "Hanging leg raise",
+        "name_en": "Hanging leg raise",
         "type": "Calisthenics",
-        "muscle": "Keskivartalo"
+        "muscle": "Vatsalihakset"
     },
     {
         "name": "Face pull",
+        "name_en": "Face pull",
         "type": "Weighted",
-        "muscle": "Yläkroppa"
+        "muscle": "Yläselkä, takaolkapäät"
     },
     {
         "name": "Pystysoutu",
+        "name_en": "Upright row",
         "type": "Weighted",
-        "muscle": "Yläkroppa"
+        "muscle": "Olkapäät"
     },
     {
         "name": "Hammer curl",
+        "name_en": "Hammer curl",
         "type": "Weighted",
-        "muscle": "Kädet"
+        "muscle": "Hauikset"
     },
     {
         "name": "Kapea penkki",
+        "name_en": "Close-grip bench press",
         "type": "Weighted",
-        "muscle": "Kädet"
+        "muscle": "Ojentajat"
     },
     {
         "name": "Pec deck",
+        "name_en": "Pec deck fly",
         "type": "Weighted",
-        "muscle": "Yläkroppa"
+        "muscle": "Rinta"
     },
     {
         "name": "Käsipainopenkki",
+        "name_en": "Dumbbell bench press",
         "type": "Weighted",
-        "muscle": "Yläkroppa"
+        "muscle": "Rinta"
     },
     {
         "name": "Käsipainopunnerrus",
+        "name_en": "Dumbbell press",
         "type": "Weighted",
-        "muscle": "Yläkroppa"
+        "muscle": "Rinta"
     },
     {
         "name": "Käsipainokyykky",
+        "name_en": "Dumbbell squat",
         "type": "Weighted",
-        "muscle": "Alakroppa"
+        "muscle": "Jalat (etureidet, pakarat)"
     },
     {
         "name": "Yhden jalan kyykky",
+        "name_en": "Pistol squat",
         "type": "Calisthenics",
-        "muscle": "Alakroppa"
+        "muscle": "Jalat (etureidet, pakarat)"
     },
     {
         "name": "Askelkyykky",
+        "name_en": "Lunge",
         "type": "Weighted",
-        "muscle": "Alakroppa"
+        "muscle": "Jalat (etureidet, pakarat)"
     },
     {
         "name": "Bulgarialainen kyykky",
+        "name_en": "Bulgarian split squat",
         "type": "Weighted",
-        "muscle": "Alakroppa"
+        "muscle": "Jalat (pakarat, takareidet)"
     },
     {
         "name": "Pystypunnerrus käsipainoilla",
+        "name_en": "Dumbbell shoulder press",
         "type": "Weighted",
-        "muscle": "Yläkroppa"
+        "muscle": "Olkapäät"
     },
     {
         "name": "Yhden käden soutu",
+        "name_en": "One-arm row",
         "type": "Weighted",
-        "muscle": "Yläkroppa"
+        "muscle": "Selkä"
     },
     {
         "name": "Vatsapyörä",
+        "name_en": "Ab wheel rollout",
         "type": "Calisthenics",
-        "muscle": "Keskivartalo"
+        "muscle": "Vatsalihakset"
     },
     {
         "name": "Lantionnosto",
+        "name_en": "Glute bridge",
         "type": "Calisthenics",
-        "muscle": "Alakroppa"
+        "muscle": "Pakara"
     },
     {
         "name": "Lantionnosto tangolla",
+        "name_en": "Barbell hip thrust",
         "type": "Weighted",
-        "muscle": "Alakroppa"
+        "muscle": "Pakara"
     },
     {
         "name": "Pystypunnerrus koneessa",
+        "name_en": "Machine shoulder press",
         "type": "Weighted",
-        "muscle": "Yläkroppa"
+        "muscle": "Olkapäät"
     },
     {
         "name": "Ristikkäistalja",
+        "name_en": "Cable crossover",
         "type": "Weighted",
-        "muscle": "Yläkroppa"
+        "muscle": "Rinta"
     },
     {
         "name": "Vatsapenkki",
+        "name_en": "Decline sit-up bench",
         "type": "Weighted",
-        "muscle": "Keskivartalo"
+        "muscle": "Vatsalihakset"
     },
     {
         "name": "Pystysoutu käsipainoilla",
+        "name_en": "Dumbbell upright row",
         "type": "Weighted",
-        "muscle": "Yläkroppa"
+        "muscle": "Olkapäät"
     },
     {
         "name": "Pystysoutu tangolla",
+        "name_en": "Barbell upright row",
         "type": "Weighted",
-        "muscle": "Yläkroppa"
+        "muscle": "Olkapäät"
     },
     {
         "name": "Pystypunnerrus laitteessa",
+        "name_en": "Machine overhead press",
         "type": "Weighted",
-        "muscle": "Yläkroppa"
+        "muscle": "Olkapäät"
     },
     {
         "name": "Pystysoutu laitteessa",
+        "name_en": "Machine upright row",
         "type": "Weighted",
-        "muscle": "Yläkroppa"
-    },
-    {
-        "name": "Reverse fly",
-        "type": "Weighted",
-        "muscle": "Yläkroppa"
-    },
-    {
-        "name": "Käsipainolähennys",
-        "type": "Weighted",
-        "muscle": "Alakroppa"
-    },
-    {
-        "name": "Käsipainolohennus",
-        "type": "Weighted",
-        "muscle": "Alakroppa"
-    },
-    {
-        "name": "Pystypunnerrus yhdellä kädellä",
-        "type": "Weighted",
-        "muscle": "Yläkroppa"
+        "muscle": "Olkapäät"
     },
     {
         "name": "Pystysoutu yhdellä kädellä",
+        "name_en": "One-arm upright row",
         "type": "Weighted",
-        "muscle": "Yläkroppa"
-    },
-    {
-        "name": "Pystypunnerrus kahvakuulalla",
-        "type": "Weighted",
-        "muscle": "Yläkroppa"
-    },
-    {
-        "name": "Kahvakuulaheilautus",
-        "type": "Weighted",
-        "muscle": "Alakroppa"
-    },
-    {
-        "name": "Farmer's walk",
-        "type": "Weighted",
-        "muscle": "Koko keho"
-    },
-    {
-        "name": "Pystysoutu kahvakuulalla",
-        "type": "Weighted",
-        "muscle": "Yläkroppa"
-    },
-    {
-        "name": "Kyykky kahvakuulalla",
-        "type": "Weighted",
-        "muscle": "Alakroppa"
+        "muscle": "Olkapäät"
     },
     {
         "name": "Rinnalle veto",
+        "name_en": "Power clean",
         "type": "Weighted",
-        "muscle": "Yläkroppa"
+        "muscle": "Koko keho"
     }
 ]

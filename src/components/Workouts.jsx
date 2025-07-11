@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
 import { db } from "../db/dexie";
+import { saveWorkout, refreshWorkoutData } from "../utils/workoutUtils";
+import ExerciseSelector from "./ExerciseSelector";
+import ExerciseInputs from "./ExerciseInputs";
+import NewExercise from "./NewExercise";
+import Toast from "./Toast";
+import { useToast } from "../hooks/useToast";
+import { useExerciseDropdown } from "../hooks/useExerciseDropdown";
+import { Trash2, Edit3, X, Save } from "lucide-react";
 
 const Workouts = () => {
     const [workouts, setWorkouts] = useState([]);
@@ -7,19 +15,29 @@ const Workouts = () => {
     const [loading, setLoading] = useState(true);
     const [editingWorkoutId, setEditingWorkoutId] = useState(null);
     const [editSets, setEditSets] = useState([]);
+    const [editingRowIdx, setEditingRowIdx] = useState(null); // Track which row is being edited
     const [noteByWorkout, setNoteByWorkout] = useState({});
     const [editDate, setEditDate] = useState("");
     const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
+    // Toast notifications
+    const { toast, showToast, hideToast } = useToast();
+
+    // Use the dropdown hook for exercise selection in edit mode
+    const {
+        dropdownIdx,
+        search,
+        exercises,
+        handleDropdown,
+        handleSelectExercise,
+        handleSearchChange,
+        inputRefs
+    } = useExerciseDropdown(editSets, setEditSets, false); // Don't save to localStorage when editing
+
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
-            const ws = await db.workouts.orderBy('date').reverse().toArray();
-            const data = await db.data.toArray();
-            const setsMap = {};
-            ws.forEach(w => {
-                setsMap[w.id] = data.filter(s => s.workoutId === w.id);
-            });
+            const { workouts: ws, setsByWorkout: setsMap } = await refreshWorkoutData();
             setWorkouts(ws);
             setSetsByWorkout(setsMap);
             setLoading(false);
@@ -30,36 +48,71 @@ const Workouts = () => {
     // Start editing a workout
     const handleEdit = (workoutId) => {
         setEditingWorkoutId(workoutId);
-        setEditSets(setsByWorkout[workoutId]?.map(s => ({ ...s })) || []);
+        const currentSets = setsByWorkout[workoutId]?.map(s => ({ ...s })) || [];
+        // If no sets exist, add an empty one to start with
+        if (currentSets.length === 0) {
+            currentSets.push({ exercise: "", reps: 8, sets: 2, weight: "" });
+        }
+        setEditSets(currentSets);
+        setEditingRowIdx(null); // Reset row editing when starting workout edit
         // Load note for this workout (date will be set automatically on save)
         const workout = workouts.find(w => w.id === workoutId);
         setNoteByWorkout(prev => ({ ...prev, [workoutId]: workout?.note || "" }));
         setEditDate(workout?.date || "");
     };
 
+    // Handle clicking on a table row to edit that specific exercise
+    const handleRowClick = (rowIdx) => {
+        if (editingWorkoutId) {
+            setEditingRowIdx(editingRowIdx === rowIdx ? null : rowIdx);
+        }
+    };
+
     // Cancel editing
     const handleCancel = () => {
         setEditingWorkoutId(null);
         setEditSets([]);
+        setEditingRowIdx(null);
         setEditDate("");
     };
 
-    // Track which exercise input is focused
-    const [focusedExerciseIdx, setFocusedExerciseIdx] = useState(null);
-
     // Handle input change
-    const handleInputChange = (idx, field, value) => {
-        setEditSets(prev => prev.map((s, i) => i === idx ? { ...s, [field]: value } : s));
+    const handleSetChange = (idx, field, value) => {
+        setEditSets(prev => {
+            const newData = prev.map((s, i) => i === idx ? { ...s, [field]: value } : s);
+            return newData;
+        });
     };
 
     // Delete a set from editSets
-    const handleDeleteSet = (setId) => {
-        setEditSets(prev => prev.filter(s => s.id !== setId));
+    const handleDeleteSet = (idx) => {
+        setEditSets(prev => {
+            const newSets = prev.filter((_, i) => i !== idx);
+            // If no sets remain, add an empty one to continue editing
+            if (newSets.length === 0) {
+                newSets.push({ exercise: "", reps: 8, sets: 2, weight: "" });
+                // Auto-select the newly created empty row
+                setTimeout(() => setEditingRowIdx(0), 0);
+            } else {
+                // Look for the first empty row (no exercise name) and auto-select it
+                const emptyRowIdx = newSets.findIndex(set => !set.exercise || set.exercise.trim() === "");
+                if (emptyRowIdx !== -1) {
+                    setTimeout(() => setEditingRowIdx(emptyRowIdx), 0);
+                } else {
+                    setEditingRowIdx(null); // No empty rows, close editing
+                }
+            }
+            return newSets;
+        });
     };
 
     // Add a new row to editSets
     const handleAddRow = () => {
-        setEditSets(prev => ([...prev, { exercise: "", reps: "", sets: "", weight: "" }]));
+        setEditSets(prev => {
+            const newSets = [...prev, { exercise: "", reps: 8, sets: 2, weight: "" }];
+            setEditingRowIdx(newSets.length - 1); // Automatically select the new row for editing
+            return newSets;
+        });
     };
 
     // Delete a whole workout (all sets and the workout entry)
@@ -72,72 +125,41 @@ const Workouts = () => {
         // Delete the workout itself
         await db.workouts.delete(workoutId);
         // Refresh data
-        const ws = await db.workouts.orderBy('date').reverse().toArray();
-        const data = await db.data.toArray();
-        const setsMap = {};
-        ws.forEach(w => {
-            setsMap[w.id] = data.filter(s => s.workoutId === w.id);
-        });
+        const { workouts: ws, setsByWorkout: setsMap } = await refreshWorkoutData();
         setWorkouts(ws);
         setSetsByWorkout(setsMap);
         setEditingWorkoutId(null);
         setEditSets([]);
+        setEditingRowIdx(null);
         setConfirmDeleteId(null);
     };
 
     const handleSave = async () => {
-        for (const s of editSets) {
-            if (!s.exercise || s.reps === "" || s.sets === "" || s.weight === "") {
-                alert("All fields must be filled in.");
-                return;
-            }
-            if (Number(s.reps) < 0 || Number(s.sets) < 0 || Number(s.weight) < 0) {
-                alert("Negative numbers are not allowed.");
-                return;
-            }
-        }
-        for (const s of editSets) {
-            if (s.id) {
-                await db.data.update(s.id, {
-                    exercise: s.exercise,
-                    reps: Number(s.reps),
-                    sets: Number(s.sets),
-                    weight: Number(s.weight)
-                });
-            } else {
-                // New row, add to DB
-                await db.data.add({
-                    exercise: s.exercise,
-                    reps: Number(s.reps),
-                    sets: Number(s.sets),
-                    weight: Number(s.weight),
-                    workoutId: editingWorkoutId
-                });
-            }
-        }
-        // Save note and update date to the selected value
-        if (editingWorkoutId) {
-            await db.workouts.update(editingWorkoutId, {
+        try {
+            await saveWorkout({
+                date: editDate,
+                sets: editSets,
                 note: noteByWorkout[editingWorkoutId],
-                date: editDate || new Date().toISOString().slice(0, 10)
-            });
+                workoutId: editingWorkoutId
+            }, true);
+
+            const { workouts: ws, setsByWorkout: setsMap } = await refreshWorkoutData();
+            setWorkouts(ws);
+            setSetsByWorkout(setsMap);
+            setEditingWorkoutId(null);
+            setEditSets([]);
+            setEditingRowIdx(null);
+            setNoteByWorkout({});
+            setEditDate("");
+
+            showToast("Treeni tallennettu onnistuneesti! 🎉", "success");
+        } catch (err) {
+            showToast(err.message, "error");
         }
-        const ws = await db.workouts.orderBy('date').reverse().toArray();
-        const data = await db.data.toArray();
-        const setsMap = {};
-        ws.forEach(w => {
-            setsMap[w.id] = data.filter(s => s.workoutId === w.id);
-        });
-        setWorkouts(ws);
-        setSetsByWorkout(setsMap);
-        setEditingWorkoutId(null);
-        setEditSets([]);
-        setNoteByWorkout({});
-        setEditDate("");
     };
 
-    if (loading) return <div className="text-gray-300 text-center">Ladataan...</div>;
-    if (!workouts.length) return <div className="text-gray-500"><h2 className="text-2xl text-green-400 text-center font-bold mb-4">Ei merkattuja treenejä</h2></div>;
+    if (loading) return <div className="text-stone-300 text-center">Ladataan...</div>;
+    if (!workouts.length) return <div className="text-stone-300"><h2 className="text-2xl text-white-400 text-center font-bold mb-4">Ei merkattuja treenejä</h2></div>;
 
     // Helper to format yyyy-mm-dd to dd.mm.yyyy
     const formatFinnishDate = (isoDate) => {
@@ -146,30 +168,38 @@ const Workouts = () => {
         return `${day}.${month}.${year}`;
     };
     return (
-        <div className="max-w-2xl mx-auto mt-8 bg-gray-800 p-6 rounded-xl shadow-lg">
-            <h2 className="text-2xl font-bold mb-4 text-green-400 text-center">Treenit</h2>
+        <div className="w-full md:max-w-2xl md:mx-auto mt-8  p-1 pt-4 pb-4 md:p-6 rounded-xl shadow-lg">
+            <h2 className="text-2xl font-bold mb-4 text-white-400 text-center">Treenit</h2>
             {workouts.map(w => (
-                <div key={w.id} className="bg-gray-900 rounded-xl shadow p-3 border border-gray-700 mb-6">
+                <div key={w.id} className="bg-black border border-stone-700 rounded-xl shadow p-3 mb-6">
                     <div className="flex justify-between items-center mb-3">
                         {editingWorkoutId !== w.id ? null :
                             <button
-                                className="bg-red-600 hover:bg-red-500 text-white rounded px-2 py-1 text-xs shadow"
+                                className="hover:text-red-700 text-red-600 duration-500 border border-red-600 hover:border-red-700 rounded px-2 py-1 text-xs shadow flex items-center gap-1"
                                 onClick={() => setConfirmDeleteId(w.id)}
                                 type="button"
-                            >Poista</button>}
+                            >
+                                <Trash2 size={20} />
+                            </button>}
                         {confirmDeleteId && (
                             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-                                <div className="bg-gray-800 p-3 rounded-xl shadow-lg border border-gray-600 max-w-xs w-full text-center">
-                                    <h3 className="text-lg font-bold  mb-2">Haluatko poistaa tämän treenin?</h3>
+                                <div className="bg-black border border-stone-700 p-3 rounded-xl shadow-lg max-w-xs w-full text-center">
+                                    <h3 className="text-lg font-bold mb-2 text-white">Haluatko poistaa tämän treenin?</h3>
                                     <div className="flex justify-center gap-4 mt-2">
                                         <button
-                                            className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded shadow text-sm"
+                                            className="hover:text-white text-red-400 duration-500 border border-red-600 hover:border-white rounded px-4 py-2 text-sm shadow flex items-center justify-center gap-1"
                                             onClick={() => handleDeleteWorkout(confirmDeleteId)}
-                                        >Kyllä</button>
+                                        >
+                                            <Trash2 size={15} />
+                                            Kyllä
+                                        </button>
                                         <button
-                                            className="px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded shadow text-sm"
+                                            className="px-4 py-2 hover:text-white text-stone-400 duration-500 border border-stone-400 hover:border-white rounded shadow text-sm flex items-center justify-center gap-1"
                                             onClick={() => setConfirmDeleteId(null)}
-                                        >Peruuta</button>
+                                        >
+                                            <X size={15} />
+                                            Peruuta
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -178,7 +208,7 @@ const Workouts = () => {
                             <>
                                 <input
                                     type="date"
-                                    className="font-bold text-green-400 bg-gray-900 border border-gray-700 rounded px-2 py-1 text-center text-sm w-36 focus:outline-none focus:ring-2 focus:ring-green-400"
+                                    className="font-bold text-white-400 bg-black border border-stone-700 rounded px-2 py-1 text-center text-sm w-36 focus:outline-none focus:ring-2 "
                                     value={editDate}
                                     onChange={e => setEditDate(e.target.value)}
                                     style={{ minWidth: 120 }}
@@ -186,118 +216,99 @@ const Workouts = () => {
 
                             </>
                         ) : (
-                            <div className="font-bold text-green-400 flex items-center justify-center text-center text-sm">{formatFinnishDate(w.date)} </div>
+                            <div className="font-bold text-white-400 flex items-center justify-center text-center text-sm">{formatFinnishDate(w.date)} </div>
                         )}
                         {editingWorkoutId === w.id ?
                             <button
-                                className="text-xs px-3 py-1 bg-gray-700 hover:bg-gray-600 text-white rounded shadow"
+                                className="hover:text-white text-stone-400 duration-500 border border-stone-400 hover:border-white text-xs px-3 py-1 rounded shadow flex items-center gap-1"
                                 onClick={handleCancel}
-                            >Peruuta
+                            >
+                                <X size={20} />
                             </button>
                             : (
-                                <div className="text-gray-500 text-sm flex gap-2">
-                                    <button
-                                        className="text-xs px-3 py-1 bg-blue-700 hover:bg-blue-600 text-white rounded shadow"
-                                        onClick={() => handleEdit(w.id)}
-                                    >Muokkaa</button>
-                                </div>
+                                <button
+                                    className="hover:text-white text-stone-400 duration-500 border border-stone-400 hover:border-white text-xs px-3 py-1 rounded shadow flex items-center gap-1"
+                                    onClick={() => handleEdit(w.id)}
+                                >
+                                    <Edit3 size={20} />
+                                </button>
                             )}
                     </div>
                     <div className="overflow-x-auto">
                         <table className="w-full text-xs table-auto ">
                             <thead>
-                                <tr className="bg-gray-800 text-green-300 border-b border-gray-700">
+                                <tr className="bg-black text-stone-100 border-b border-green-600">
                                     <th className="py-2 rounded-tl-lg">Liike</th>
                                     <th className="py-2">Sarjat</th>
                                     <th className="py-2">Toistot</th>
-                                    {editingWorkoutId === w.id ? <th className="py-2">Paino</th> : <th className="py-2 rounded-tr-lg">Paino</th>}
-                                    {editingWorkoutId === w.id && <th className="py-2 rounded-tr-lg"></th>}
+                                    <th className="py-2 rounded-tr-lg">Paino</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {editingWorkoutId === w.id
-                                    ? editSets.map((s, i) => (
-                                        <tr key={s.id ? `id-${s.id}` : `new-${i}`} className="bg-gray-700 hover:bg-gray-600 transition-colors border-b border-gray-700">
-                                            <td className="px-2 py-1 text-center align-middle">
-                                                <input
-                                                    className={`bg-gray-800 border border-gray-600 rounded px-2 py-1 text-white focus:outline-none focus:ring-2 focus:ring-green-400 transition-all duration-200 ${focusedExerciseIdx === i ? 'w-44 md:w-56' : 'w-full md:w-32'}`}
-                                                    value={s.exercise}
-                                                    onChange={e => handleInputChange(i, 'exercise', e.target.value)}
-                                                    onFocus={() => setFocusedExerciseIdx(i)}
-                                                    onBlur={() => setFocusedExerciseIdx(null)}
-                                                    required
-                                                />
-                                            </td>
-                                            <td className="py-1 text-center align-middle">
-                                                <input
-                                                    className="bg-gray-800 border border-gray-600 rounded  py-1 text-white w-9 md:w-11 focus:outline-none focus:ring-2 focus:ring-green-400 text-center"
-                                                    type="number"
-                                                    min="0"
-                                                    value={s.sets}
-                                                    onChange={e => handleInputChange(i, 'sets', e.target.value)}
-                                                    required
-                                                />
-                                            </td>
-                                            <td className="py-1 text-center align-middle">
-                                                <input
-                                                    className="bg-gray-800 border border-gray-600 rounded  py-1 text-white w-9 md:w-11 focus:outline-none focus:ring-2 focus:ring-green-400 text-center"
-                                                    type="number"
-                                                    min="0"
-                                                    value={s.reps}
-                                                    onChange={e => handleInputChange(i, 'reps', e.target.value)}
-                                                    required
-                                                />
-                                            </td>
-                                            <td className="py-1 text-center align-middle">
-                                                <input
-                                                    className="bg-gray-800 border border-gray-600 rounded  py-1 text-white w-9 md:w-11 focus:outline-none focus:ring-2 focus:ring-green-400 text-center"
-                                                    type="number"
-                                                    min="0"
-                                                    value={s.weight}
-                                                    onChange={e => handleInputChange(i, 'weight', e.target.value)}
-                                                />
-                                            </td>
-                                            <td className="px-1 py-1 text-center align-middle">
-                                                <button
-                                                    className="text-red-400 font-bold rounded px-1 py-1 w-4 md:w-8"
-                                                    type="button"
-                                                    onClick={() => handleDeleteSet(s.id)}
-                                                >X</button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                    : setsByWorkout[w.id]?.map((s, i) => (
-                                        <tr key={s.id ? `id-${s.id}` : `new-${i}`} className="bg-gray-800 hover:bg-gray-700 transition-colors border-b border-gray-700">
-                                            <td className="px-4 py-3 text-center">{s.exercise}</td>
-                                            <td className="px-4 py-3 text-center">{s.sets}</td>
-                                            <td className="px-4 py-3 text-center">{s.reps}</td>
-                                            <td className="px-4 py-3 text-center">{s.weight === 0 ? '-' : s.weight}</td>
-                                        </tr>
-                                    ))}
+                                {(editingWorkoutId === w.id ? editSets : setsByWorkout[w.id] || []).map((s, i) => (
+                                    <tr
+                                        key={s.id ? `id-${s.id}` : `new-${i}`}
+                                        className={`bg-black hover:bg-stone-800 transition-colors border-b border-stone-700 ${editingWorkoutId === w.id ? 'cursor-pointer' : ''}`}
+                                        onClick={() => editingWorkoutId === w.id && handleRowClick(i)}
+                                    >
+                                        <td className="px-4 py-3 text-center">{s.exercise}</td>
+                                        <td className="px-4 py-3 text-center">{s.sets}</td>
+                                        <td className="px-4 py-3 text-center">{s.reps}</td>
+                                        <td className="px-4 py-3 text-center">{s.weight === 0 ? '-' : s.weight}</td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     </div>
                     {editingWorkoutId === w.id && (
-                        <div className="flex justify-start">
-                            <button
-                                className="text-green-400 underline mt-2 mb-1 text-sm"
-                                type="button"
-                                onClick={handleAddRow}
-                            >Lisää liike+
-                            </button>
+                        <div className="mt-2 space-y-4">
+                            {editingRowIdx !== null && editSets[editingRowIdx] ? (
+                                <div className="bg-black border border-stone-700 rounded-lg p-4 flex flex-col gap-3 relative shadow">
+                                    <ExerciseSelector
+                                        idx={editingRowIdx}
+                                        set={editSets[editingRowIdx]}
+                                        inputRefs={inputRefs}
+                                        handleSearchChange={handleSearchChange}
+                                        handleDropdown={handleDropdown}
+                                        dropdownIdx={dropdownIdx}
+                                        exercises={exercises}
+                                        search={search}
+                                        handleSelectExercise={handleSelectExercise}
+                                    />
+                                    <ExerciseInputs
+                                        idx={editingRowIdx}
+                                        set={editSets[editingRowIdx]}
+                                        handleSetChange={handleSetChange}
+                                    />
+                                    {editSets.length > 1 && (
+                                        <button
+                                            type="button"
+                                            onClick={() => handleDeleteSet(editingRowIdx)}
+                                            className="text-red-400 font-bold text-2xl absolute top-0 right-2 z-10 hover:text-red-600"
+                                            aria-label="Remove exercise"
+                                        >
+                                            ×
+                                        </button>
+                                    )}
+                                </div>
+                            ) : (
+                                null
+                            )
+                            }
+                            <NewExercise addExercise={handleAddRow} />
                         </div>
                     )}
                     {editingWorkoutId !== w.id && (w.note) && (
                         <div className="mt-2">
-                            <div className="w-full min-h-[60px] bg-gray-800 border border-gray-600 rounded p-2 text-sm text-white text-left whitespace-pre-wrap">
+                            <div className="w-full min-h-[60px] bg-black border border-stone-700 rounded p-2 text-sm text-white text-left whitespace-pre-wrap">
                                 {w.note}
                             </div>
                         </div>
                     )}
                     {editingWorkoutId === w.id && (
-                        <div className="mt-2">
+                        <div className="mt-2 ">
                             <textarea
-                                className="w-full min-h-[60px] bg-gray-800 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                                className="w-full min-h-[60px] bg-black border border-stone-700 rounded p-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-stone-400"
                                 placeholder="Lisää muistiinpano tähän..."
                                 value={noteByWorkout[w.id]}
                                 onChange={e => setNoteByWorkout(prev => ({ ...prev, [w.id]: e.target.value }))}
@@ -306,11 +317,13 @@ const Workouts = () => {
                     )}
                     {editingWorkoutId === w.id ? (
                         <div className="mt-2">
-                            <div className="flex-1 flex justify-center">
+                            <div className="flex-1 flex justify-center ">
                                 <button
-                                    className="bg-green-600 hover:bg-green-700 text-white text-sm py-2 rounded-lg font-bold w-full"
+                                    className="text-green-400 duration-500 border border-green-600 hover:border-green-400 text-sm py-2 rounded-lg font-bold w-full flex items-center justify-center gap-2"
                                     onClick={handleSave}
-                                >Tallenna
+                                >
+                                    <Save size={17} />
+                                    Tallenna
                                 </button>
                             </div>
                         </div>
@@ -318,6 +331,13 @@ const Workouts = () => {
 
                 </div>
             ))}
+
+            <Toast
+                message={toast.message}
+                type={toast.type}
+                isVisible={toast.isVisible}
+                onClose={hideToast}
+            />
         </div>
     );
 };
