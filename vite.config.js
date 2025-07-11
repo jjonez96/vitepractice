@@ -13,7 +13,7 @@ export default defineConfig({
         start_url: '/',
         display: 'standalone',
         background_color: '#000000',
-        theme_color: '#2563eb',
+        theme_color: '#22c55e',
         icons: [
           {
             src: '/vite.svg',

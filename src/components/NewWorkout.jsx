@@ -56,7 +56,7 @@ const NewWorkout = ({ onSaved }) => {
             <h2 className="text-2xl text-white-400 text-center font-bold mb-4">Uusi Treeni</h2>
             <form onSubmit={handleSubmit} className="w-full md:max-w-2xl md:mx-auto space-y-6 bg-black border border-stone-700 p-2 pt-4 pb-4 md:p-6 rounded-xl shadow-lg">
                 <div>
-                    <input type="date" value={date} onChange={e => setDate(e.target.value)} className="border border-stone-700 bg-black text-white rounded px-2 py-1 w-48 focus:outline-none focus:ring-2 focus:ring-green-500" required />
+                    <input type="date" value={date} onChange={e => setDate(e.target.value)} className="border border-stone-700 bg-black text-white rounded px-2 py-1 w-36 focus:outline-none focus:ring-2 focus:ring-green-600" required />
                 </div>
                 <div>
                     <div className="space-y-4">

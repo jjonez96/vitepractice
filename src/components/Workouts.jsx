@@ -208,7 +208,7 @@ const Workouts = () => {
                             <>
                                 <input
                                     type="date"
-                                    className="font-bold text-white-400 bg-black border border-stone-700 rounded px-2 py-1 text-center text-sm w-36 focus:outline-none focus:ring-2 "
+                                    className="font-bold text-white-400 bg-black border border-stone-700 rounded px-2 py-1 text-center text-sm w-36 focus:outline-none focus:ring-2 focus:ring-green-600"
                                     value={editDate}
                                     onChange={e => setEditDate(e.target.value)}
                                     style={{ minWidth: 120 }}
@@ -220,14 +220,14 @@ const Workouts = () => {
                         )}
                         {editingWorkoutId === w.id ?
                             <button
-                                className="hover:text-white text-stone-400 duration-500 border border-stone-400 hover:border-white text-xs px-3 py-1 rounded shadow flex items-center gap-1"
+                                className="hover:text-white text-stone-400 duration-500 border border-stone-400 hover:border-white text-xs px-2 py-1 rounded shadow flex items-center gap-1"
                                 onClick={handleCancel}
                             >
                                 <X size={20} />
                             </button>
                             : (
                                 <button
-                                    className="hover:text-white text-stone-400 duration-500 border border-stone-400 hover:border-white text-xs px-3 py-1 rounded shadow flex items-center gap-1"
+                                    className="hover:text-white text-stone-400 duration-500 border border-stone-400 hover:border-white text-xs px-2 py-1 rounded shadow flex items-center gap-1"
                                     onClick={() => handleEdit(w.id)}
                                 >
                                     <Edit3 size={20} />
@@ -248,7 +248,7 @@ const Workouts = () => {
                                 {(editingWorkoutId === w.id ? editSets : setsByWorkout[w.id] || []).map((s, i) => (
                                     <tr
                                         key={s.id ? `id-${s.id}` : `new-${i}`}
-                                        className={`bg-black hover:bg-stone-800 transition-colors border-b border-stone-700 ${editingWorkoutId === w.id ? 'cursor-pointer' : ''}`}
+                                        className={`bg-black hover:bg-stone-900 transition-colors border-b border-stone-700 ${editingWorkoutId === w.id ? 'cursor-pointer' : ''}`}
                                         onClick={() => editingWorkoutId === w.id && handleRowClick(i)}
                                     >
                                         <td className="px-4 py-3 text-center">{s.exercise}</td>
