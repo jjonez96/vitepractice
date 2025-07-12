@@ -7,7 +7,7 @@ import NewExercise from "./NewExercise";
 import Toast from "./Toast";
 import { useToast } from "../hooks/useToast";
 import { useExerciseDropdown } from "../hooks/useExerciseDropdown";
-import { Trash2, Edit3, X, Save } from "lucide-react";
+import { Trash2, Edit3, X, Save, CalendarArrowUp, CalendarArrowDown, NotebookPen } from "lucide-react";
 
 const Workouts = () => {
     const [workouts, setWorkouts] = useState([]);
@@ -19,6 +19,8 @@ const Workouts = () => {
     const [noteByWorkout, setNoteByWorkout] = useState({});
     const [editDate, setEditDate] = useState("");
     const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+    const [sortOrder, setSortOrder] = useState('desc'); // 'desc' for newest first, 'asc' for oldest first
+    const [showNoteForWorkout, setShowNoteForWorkout] = useState(null); // Track which workout has note visible
 
     // Toast notifications
     const { toast, showToast, hideToast } = useToast();
@@ -59,6 +61,11 @@ const Workouts = () => {
         const workout = workouts.find(w => w.id === workoutId);
         setNoteByWorkout(prev => ({ ...prev, [workoutId]: workout?.note || "" }));
         setEditDate(workout?.date || "");
+
+        // If note has content, keep it open when editing
+        if (workout?.note && workout.note.trim() !== "") {
+            setShowNoteForWorkout(workoutId);
+        }
     };
 
     // Handle clicking on a table row to edit that specific exercise
@@ -74,6 +81,12 @@ const Workouts = () => {
         setEditSets([]);
         setEditingRowIdx(null);
         setEditDate("");
+        setShowNoteForWorkout(null);
+    };
+
+    // Toggle note visibility
+    const toggleNote = (workoutId) => {
+        setShowNoteForWorkout(prev => prev === workoutId ? null : workoutId);
     };
 
     // Handle input change
@@ -158,6 +171,18 @@ const Workouts = () => {
         }
     };
 
+    // <CalendarArrowUp workouts by date
+    const toggleSortOrder = () => {
+        setSortOrder(prev => prev === 'desc' ? 'asc' : 'desc');
+    };
+
+    // <CalendarArrowUp workouts based on current sort order
+    const sortedWorkouts = [...workouts].sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
+    });
+
     if (loading) return <div className="text-stone-300 text-center">Ladataan...</div>;
     if (!workouts.length) return <div className="text-stone-300"><h2 className="text-2xl text-white text-center font-bold pt-20">Ei merkattuja treenejä</h2></div>;
 
@@ -169,8 +194,16 @@ const Workouts = () => {
     };
     return (
         <div className="w-full md:max-w-2xl md:mx-auto mt-8  p-1 pt-4 pb-4 md:p-6 rounded-xl shadow-lg">
-            <h2 className="text-2xl font-bold mb-4 text-white-400 text-center">Treenit</h2>
-            {workouts.map(w => (
+            <div className="">
+                <h2 className="text-2xl font-bold text-white-400 text-center">Treenit</h2>
+                <button
+                    onClick={toggleSortOrder}
+                    className="text-green-500 hover:text-green-300 duration-500 px-5 py-2"
+                >
+                    {sortOrder === 'desc' ? <CalendarArrowDown size={25} /> : <CalendarArrowUp size={25} />}
+                </button>
+            </div>
+            {sortedWorkouts.map(w => (
                 <div key={w.id} className="bg-black border border-stone-700 rounded-xl shadow p-3 mb-6">
                     <div className="flex justify-between items-center mb-3">
                         {editingWorkoutId !== w.id ? null :
@@ -219,12 +252,14 @@ const Workouts = () => {
                             <div className="font-bold text-white-400 flex items-center justify-center text-center text-sm">{formatFinnishDate(w.date)} </div>
                         )}
                         {editingWorkoutId === w.id ?
+
                             <button
                                 className="hover:text-white text-stone-400 duration-500 border border-stone-400 hover:border-white text-xs px-2 py-1 rounded shadow flex items-center gap-1"
                                 onClick={handleCancel}
                             >
                                 <X size={20} />
                             </button>
+
                             : (
                                 <button
                                     className="hover:text-white text-stone-400 duration-500 border border-stone-400 hover:border-white text-xs px-2 py-1 rounded shadow flex items-center gap-1"
@@ -234,10 +269,10 @@ const Workouts = () => {
                                 </button>
                             )}
                     </div>
-                    <div className="border border-stone-700 rounded-lg overflow-hidden">
-                        <table className="w-full text-xs table-auto ">
+                    <div className="border border-stone-700 rounded-lg overflow-x-auto">
+                        <table className="w-full text-xs table-auto  ">
                             <thead>
-                                <tr className="bg-black text-stone-100 border-b border-green-600">
+                                <tr className="bg-black text-stone-100 border-b border-green-600 ">
                                     <th className="py-2 rounded-tl-lg">Liike</th>
                                     <th className="py-2">Sarjat</th>
                                     <th className="py-2">Toistot</th>
@@ -263,7 +298,7 @@ const Workouts = () => {
                     {editingWorkoutId === w.id && (
                         <div className="mt-6 space-y-4">
                             {editingRowIdx !== null && editSets[editingRowIdx] ? (
-                                <div className="bg-black border border-green-900 rounded-lg p-4 flex flex-col relative shadow">
+                                <div className="bg-black border border-green-900 rounded-lg p-4 flex flex-col relative shadow ">
                                     <ExerciseSelector
                                         idx={editingRowIdx}
                                         set={editSets[editingRowIdx]}
@@ -295,8 +330,14 @@ const Workouts = () => {
                                 null
                             )
                             }
-                            <div className="pb-2">
+                            <div className="pb-2 flex justify-between items-center">
                                 <NewExercise addExercise={handleAddRow} />
+                                <button
+                                    onClick={() => toggleNote(w.id)}
+                                    className="hover:text-green-300 text-green-500 duration-500 hover:border-white text-xs"
+                                >
+                                    <NotebookPen size={25} />
+                                </button>
                             </div>
                         </div>
                     )}
@@ -307,7 +348,7 @@ const Workouts = () => {
                             </div>
                         </div>
                     )}
-                    {editingWorkoutId === w.id && (
+                    {editingWorkoutId === w.id && showNoteForWorkout === w.id && (
                         <div className="mt-2 ">
                             <textarea
                                 className="w-full min-h-[60px] bg-black border border-stone-700 rounded-lg p-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-stone-400"

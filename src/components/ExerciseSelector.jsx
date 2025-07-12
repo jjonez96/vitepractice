@@ -17,7 +17,7 @@ const ExerciseSelector = ({
     );
 
     return (
-        <div className="flex-1 w-full mb-2">
+        <div className="flex-1 w-full mb-2 relative">
             <label className="block text-sm mb-1">Liike</label>
             <input
                 ref={el => (inputRefs.current[idx] = el)}
@@ -31,7 +31,7 @@ const ExerciseSelector = ({
             {dropdownIdx === idx && filtered.length > 0 && (
                 <div
                     id={`dropdown-${idx}`}
-                    className="absolute z-20 bg-black border border-stone-700 rounded shadow w-full max-h-48 overflow-y-auto mt-1"
+                    className="absolute z-20 bg-black border border-stone-700 rounded shadow w-full max-h-48 overflow-y-auto mt-1 left-1/2 transform -translate-x-1/2"
                 >
                     {filtered.map((ex, i) => (
                         <div
