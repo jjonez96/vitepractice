@@ -1,78 +1,35 @@
 import { useState, useEffect } from 'react';
 import { X, Save, Settings } from 'lucide-react';
-import { db } from '../db/dexie';
+import { useSettings } from '../hooks/useSettings';
 
 const SettingsModal = ({ isOpen, onClose }) => {
+    const { settings, updateSettings } = useSettings();
     const [useEnglishNames, setUseEnglishNames] = useState(false);
     const [defaultReps, setDefaultReps] = useState('');
     const [defaultSets, setDefaultSets] = useState('');
     const [defaultWeight, setDefaultWeight] = useState('');
     const [saving, setSaving] = useState(false);
 
-    // Load settings when modal opens
+    // Load settings when modal opens or settings change
     useEffect(() => {
         if (isOpen) {
-            loadSettings();
+            setUseEnglishNames(settings.useEnglishNames || false);
+            setDefaultReps(settings.defaultReps || '');
+            setDefaultSets(settings.defaultSets || '');
+            setDefaultWeight(settings.defaultWeight || '');
         }
-    }, [isOpen]);
-
-    const loadSettings = async () => {
-        try {
-            // Load from Dexie
-            const useEnglishRecord = await db.settings.where('key').equals('useEnglishNames').first();
-            const defaultRepsRecord = await db.settings.where('key').equals('defaultReps').first();
-            const defaultSetsRecord = await db.settings.where('key').equals('defaultSets').first();
-            const defaultWeightRecord = await db.settings.where('key').equals('defaultWeight').first();
-
-            setUseEnglishNames(useEnglishRecord?.value || false);
-            setDefaultReps(defaultRepsRecord?.value || '');
-            setDefaultSets(defaultSetsRecord?.value || '');
-            setDefaultWeight(defaultWeightRecord?.value || '');
-        } catch (error) {
-            console.error('Error loading settings:', error);
-        }
-    };
+    }, [isOpen, settings]);
 
     const handleSave = async () => {
         setSaving(true);
         try {
-            const now = new Date();
-
-            // Save each setting individually to Dexie
-            const settingsToSave = [
-                { key: 'useEnglishNames', value: useEnglishNames },
-                { key: 'defaultReps', value: Number(defaultReps) || '' },
-                { key: 'defaultSets', value: Number(defaultSets) || '' },
-                { key: 'defaultWeight', value: defaultWeight }
-            ];
-
-            for (const setting of settingsToSave) {
-                const existingRecord = await db.settings.where('key').equals(setting.key).first();
-
-                if (existingRecord) {
-                    await db.settings.update(existingRecord.id, {
-                        value: setting.value,
-                        updatedAt: now
-                    });
-                } else {
-                    await db.settings.add({
-                        key: setting.key,
-                        value: setting.value,
-                        updatedAt: now
-                    });
-                }
-            }
-
-            // Create settings object for the event
-            const settings = {
+            // Use the updateSettings method from the hook
+            await updateSettings({
                 useEnglishNames,
-                defaultReps: Number(defaultReps) || '',
                 defaultSets: Number(defaultSets) || '',
+                defaultReps: Number(defaultReps) || '',
                 defaultWeight
-            };
-
-            // Dispatch custom event to notify other components
-            window.dispatchEvent(new CustomEvent('settingsChanged', { detail: settings }));
+            });
 
             onClose();
         } catch (error) {
@@ -131,17 +88,6 @@ const SettingsModal = ({ isOpen, onClose }) => {
                             <h3 className="text-sm font-medium text-white">Liikkeiden oletusarvot</h3>
                             <div className="grid grid-cols-3 gap-3">
                                 <div>
-                                    <label className="block text-xs text-stone-400 mb-1">Toistot</label>
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        max="100"
-                                        value={defaultReps}
-                                        onChange={(e) => setDefaultReps(e.target.value)}
-                                        className="w-full px-2 py-1 bg-black border border-stone-700 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                                    />
-                                </div>
-                                <div>
                                     <label className="block text-xs text-stone-400 mb-1">Sarjat</label>
                                     <input
                                         type="number"
@@ -149,6 +95,17 @@ const SettingsModal = ({ isOpen, onClose }) => {
                                         max="20"
                                         value={defaultSets}
                                         onChange={(e) => setDefaultSets(e.target.value)}
+                                        className="w-full px-2 py-1 bg-black border border-stone-700 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs text-stone-400 mb-1">Toistot</label>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        max="100"
+                                        value={defaultReps}
+                                        onChange={(e) => setDefaultReps(e.target.value)}
                                         className="w-full px-2 py-1 bg-black border border-stone-700 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                                     />
                                 </div>
