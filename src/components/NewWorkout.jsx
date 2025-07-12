@@ -40,7 +40,7 @@ const NewWorkout = ({ onSaved }) => {
                 workoutId: null
             }, false);
 
-            setData([{ exercise: "", reps: 8, sets: 2, weight: "" }]);
+            setData([{ exercise: "", reps: "", sets: "", weight: "" }]);
             localStorage.removeItem("nw_data");
             if (onSaved) onSaved();
             showToast("Treeni tallennettu onnistuneesti! 🎉", "success");

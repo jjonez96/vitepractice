@@ -7,9 +7,11 @@ import NewExercise from "./NewExercise";
 import Toast from "./Toast";
 import { useToast } from "../hooks/useToast";
 import { useExerciseDropdown } from "../hooks/useExerciseDropdown";
+import { useSettings } from "../hooks/useSettings";
 import { Trash2, Edit3, X, Save, CalendarArrowUp, CalendarArrowDown, NotebookPen } from "lucide-react";
 
 const Workouts = () => {
+    const { settings } = useSettings();
     const [workouts, setWorkouts] = useState([]);
     const [setsByWorkout, setSetsByWorkout] = useState({});
     const [loading, setLoading] = useState(true);
@@ -22,7 +24,14 @@ const Workouts = () => {
     const [sortOrder, setSortOrder] = useState('desc'); // 'desc' for newest first, 'asc' for oldest first
     const [showNoteForWorkout, setShowNoteForWorkout] = useState(null); // Track which workout has note visible
 
-    // Toast notifications
+    // Helper function to create default exercise with current settings
+    const getDefaultExercise = () => ({
+        exercise: "",
+        reps: settings.defaultReps || "",
+        sets: settings.defaultSets || "",
+        weight: settings.defaultWeight || ""
+    });
+
     const { toast, showToast, hideToast } = useToast();
 
     // Use the dropdown hook for exercise selection in edit mode
@@ -53,7 +62,7 @@ const Workouts = () => {
         const currentSets = setsByWorkout[workoutId]?.map(s => ({ ...s })) || [];
         // If no sets exist, add an empty one to start with
         if (currentSets.length === 0) {
-            currentSets.push({ exercise: "", reps: 8, sets: 2, weight: "" });
+            currentSets.push(getDefaultExercise());
         }
         setEditSets(currentSets);
         setEditingRowIdx(null); // Reset row editing when starting workout edit
@@ -62,10 +71,6 @@ const Workouts = () => {
         setNoteByWorkout(prev => ({ ...prev, [workoutId]: workout?.note || "" }));
         setEditDate(workout?.date || "");
 
-        // If note has content, keep it open when editing
-        if (workout?.note && workout.note.trim() !== "") {
-            setShowNoteForWorkout(workoutId);
-        }
     };
 
     // Handle clicking on a table row to edit that specific exercise
@@ -103,7 +108,7 @@ const Workouts = () => {
             const newSets = prev.filter((_, i) => i !== idx);
             // If no sets remain, add an empty one to continue editing
             if (newSets.length === 0) {
-                newSets.push({ exercise: "", reps: 8, sets: 2, weight: "" });
+                newSets.push(getDefaultExercise());
                 // Auto-select the newly created empty row
                 setTimeout(() => setEditingRowIdx(0), 0);
             } else {
@@ -122,7 +127,7 @@ const Workouts = () => {
     // Add a new row to editSets
     const handleAddRow = () => {
         setEditSets(prev => {
-            const newSets = [...prev, { exercise: "", reps: 8, sets: 2, weight: "" }];
+            const newSets = [...prev, getDefaultExercise()];
             setEditingRowIdx(newSets.length - 1); // Automatically select the new row for editing
             return newSets;
         });
@@ -336,7 +341,7 @@ const Workouts = () => {
                                     onClick={() => toggleNote(w.id)}
                                     className="hover:text-green-300 text-green-500 duration-500 hover:border-white text-xs"
                                 >
-                                    <NotebookPen size={25} />
+                                    <NotebookPen size={22} />
                                 </button>
                             </div>
                         </div>

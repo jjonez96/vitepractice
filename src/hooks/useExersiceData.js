@@ -1,19 +1,47 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { db } from "../db/dexie";
 
-const getInitialData = () => {
+const getDefaultExercise = async () => {
+    try {
+        const defaultRepsRecord = await db.settings.where('key').equals('defaultReps').first();
+        const defaultSetsRecord = await db.settings.where('key').equals('defaultSets').first();
+        const defaultWeightRecord = await db.settings.where('key').equals('defaultWeight').first();
+
+        return {
+            exercise: "",
+            reps: defaultRepsRecord?.value || "",
+            sets: defaultSetsRecord?.value || "",
+            weight: defaultWeightRecord?.value || ""
+        };
+    } catch (error) {
+        console.error('Error loading settings for default exercise:', error);
+        return { exercise: "", reps: "", sets: "", weight: "" };
+    }
+};
+
+const getInitialData = async () => {
     const saved = localStorage.getItem("nw_data");
     if (saved) {
         try {
             return JSON.parse(saved);
         } catch {
-            return [{ exercise: "", reps: 8, sets: 2, weight: "" }];
+            return [await getDefaultExercise()];
         }
     }
-    return [{ exercise: "", reps: 8, sets: 2, weight: "" }];
+    return [await getDefaultExercise()];
 };
 
 export function useExerciseInputs() {
-    const [data, setData] = useState(getInitialData);
+    const [data, setData] = useState([{ exercise: "", reps: "", sets: "", weight: "" }]);
+
+    // Initialize data asynchronously
+    useEffect(() => {
+        const initializeData = async () => {
+            const initialData = await getInitialData();
+            setData(initialData);
+        };
+        initializeData();
+    }, []);
 
     const handleSetChange = (idx, field, value) => {
         setData(data => {
@@ -23,9 +51,10 @@ export function useExerciseInputs() {
         });
     };
 
-    const addExercise = () => {
+    const addExercise = async () => {
+        const defaultExercise = await getDefaultExercise();
         setData(prev => {
-            const newData = [...prev, { exercise: "", reps: 8, sets: 2, weight: "" }];
+            const newData = [...prev, defaultExercise];
             localStorage.setItem("nw_data", JSON.stringify(newData));
             return newData;
         });
@@ -39,8 +68,9 @@ export function useExerciseInputs() {
         });
     };
 
-    const resetData = () => {
-        setData([{ exercise: "", reps: 8, sets: 2, weight: "" }]);
+    const resetData = async () => {
+        const defaultExercise = await getDefaultExercise();
+        setData([defaultExercise]);
         localStorage.removeItem("nw_data");
     };
 

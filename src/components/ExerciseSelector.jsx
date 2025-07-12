@@ -1,3 +1,5 @@
+import { useSettings } from '../hooks/useSettings';
+
 const ExerciseSelector = ({
     idx,
     set,
@@ -9,12 +11,24 @@ const ExerciseSelector = ({
     search,
     handleSelectExercise
 }) => {
+    const { settings } = useSettings();
+
     // Safety check to prevent errors when set is undefined
     if (!set) return null;
 
     const filtered = exercises.filter(e =>
         (e.name + " " + (e.name_en || "") + " " + (e.muscle || "")).toLowerCase().includes((dropdownIdx === idx ? search : set.exercise).toLowerCase())
     );
+
+    // Function to get the display name based on user preference
+    const getDisplayName = (exercise) => {
+        return settings.useEnglishNames ? exercise.name_en : exercise.name;
+    };
+
+    // Function to get the secondary name (opposite of preference)
+    const getSecondaryName = (exercise) => {
+        return settings.useEnglishNames ? exercise.name : exercise.name_en;
+    };
 
     return (
         <div className="flex-1 w-full mb-2 relative">
@@ -36,12 +50,12 @@ const ExerciseSelector = ({
                     {filtered.map((ex, i) => (
                         <div
                             key={ex.name}
-                            onClick={() => handleSelectExercise(idx, ex.name)}
+                            onClick={() => handleSelectExercise(idx, getDisplayName(ex))}
                             className="p-2 hover:bg-green-900 cursor-pointer flex-col transition-colors duration-200"
                         >
                             <div className="flex justify-between items-center">
                                 <h3 className="text-sm font-semibold text-white">
-                                    {ex.name} <span className="text-sm text-stone-300">{`(${ex.name_en}), ${ex.muscle}`}</span>
+                                    {getDisplayName(ex)} <span className="text-sm text-stone-300">{`(${getSecondaryName(ex)}), ${ex.muscle}`}</span>
                                 </h3>
                             </div>
                         </div>
