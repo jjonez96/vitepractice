@@ -158,53 +158,59 @@ const Workouts = () => {
                     onClick={toggleSortOrder}
                     className="text-green-500 hover:text-green-300 duration-500 px-5 py-2"
                 >
-                    {sortOrder === 'desc' ? <CalendarArrowDown size={25} /> : <CalendarArrowUp size={25} />}
+                    {sortOrder === 'desc' ? <CalendarArrowDown size={22} /> : <CalendarArrowUp size={22} />}
                 </button>
             </div>
-            {sortedWorkouts.map(w => (
-                <div key={w.id} className="bg-black border border-stone-700 rounded-xl shadow p-3 mb-6">
-                    <div className="flex justify-between items-center mb-3">
-                        <div className="font-bold text-white-400 flex items-center justify-center text-center text-sm">{formatFinnishDate(w.date)}</div>
-                        <button
-                            className="hover:text-white text-stone-300 duration-500 hover:border-white text-xs px-2 py-1 rounded shadow flex items-center gap-1"
-                            onClick={() => handleEdit(w.id)}
-                        >
-                            <Edit3 size={25} />
-                        </button>
-                    </div>
-                    <div className="border border-stone-700 rounded-lg overflow-x-auto">
-                        <table className="w-full text-xs table-auto  ">
-                            <thead>
-                                <tr className="bg-black text-stone-100 border-b border-green-600 ">
-                                    <th className="py-2 rounded-tl-lg">Liike</th>
-                                    <th className="py-2">Sarjat</th>
-                                    <th className="py-2">Toistot</th>
-                                    <th className="py-2 rounded-tr-lg">Paino</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {(setsByWorkout[w.id] || []).map((s, i, arr) => (
-                                    <tr
-                                        key={s.id ? `id-${s.id}` : `new-${i}`}
-                                        className={`bg-black hover:bg-stone-900 transition-colors ${i < arr.length - 1 ? 'border-b border-stone-700' : ''}`}
-                                    >
-                                        <td className="px-4 py-3 text-center">{s.exercise}</td>
-                                        <td className="px-4 py-3 text-center">{s.sets}</td>
-                                        <td className="px-4 py-3 text-center">{s.reps}</td>
-                                        <td className="px-4 py-3 text-center">{s.weight === 0 ? '-' : s.weight}</td>
+            {sortedWorkouts.map((w, index) => (
+                <div key={w.id}>
+                    <div className="bg-black border border-stone-700 rounded-xl shadow p-3 mb-6">
+                        <div className="flex justify-between items-center mb-3">
+                            <div className="font-bold text-white-400 flex items-center justify-center text-center text-sm">{formatFinnishDate(w.date)}</div>
+                            <button
+                                className="hover:text-white text-stone-300 duration-500 hover:border-white text-xs px-2 py-1 rounded shadow flex items-center gap-1"
+                                onClick={() => handleEdit(w.id)}
+                            >
+                                <Edit3 size={22} />
+                            </button>
+                        </div>
+                        <div className="border border-stone-700 rounded-lg overflow-x-auto">
+                            <table className="w-full text-xs table-auto  ">
+                                <thead>
+                                    <tr className="bg-black text-stone-100 border-b border-green-600 ">
+                                        <th className="py-2 rounded-tl-lg">Liike</th>
+                                        <th className="py-2">Sarjat</th>
+                                        <th className="py-2">Toistot</th>
+                                        <th className="py-2 rounded-tr-lg">Paino</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                    {(w.note) && (
-                        <div className="mt-2">
-                            <div className="w-full min-h-[60px] bg-black border border-stone-700 rounded p-2 text-sm text-white text-left whitespace-pre-wrap">
-                                {w.note}
+                                </thead>
+                                <tbody>
+                                    {(setsByWorkout[w.id] || []).map((s, i, arr) => (
+                                        <tr
+                                            key={s.id ? `id-${s.id}` : `new-${i}`}
+                                            className={`bg-black hover:bg-stone-900 transition-colors ${i < arr.length - 1 ? 'border-b border-stone-700' : ''}`}
+                                        >
+                                            <td className="px-4 py-3 text-center">{s.exercise}</td>
+                                            <td className="px-4 py-3 text-center">{s.sets}</td>
+                                            <td className="px-4 py-3 text-center">{s.reps}</td>
+                                            <td className="px-4 py-3 text-center">{s.weight === 0 ? '-' : s.weight}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                        {(w.note) && (
+                            <div className="mt-2">
+                                <div className="w-full min-h-[60px] bg-black border border-stone-700 rounded p-2 text-sm text-white text-left whitespace-pre-wrap">
+                                    {w.note}
+                                </div>
                             </div>
+                        )}
+                    </div>
+                    {index < sortedWorkouts.length - 1 && (
+                        <div className="flex justify-center mb-6">
+                            <div className="w-2/3 h-px bg-stone-700  shadow"></div>
                         </div>
                     )}
-
                 </div>
             ))}
 

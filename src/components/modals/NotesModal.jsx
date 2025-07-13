@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
-import { X, Save, FileText } from 'lucide-react';
+import { X, Save, Trash2 } from 'lucide-react';
 import { db } from '../../db/dexie';
 import { useToast } from '../../hooks/useToast';
+import DeleteConfirmationModal from './DeleteConfirmationModal';
 import Toast from '../Toast';
 
 const NotesModal = ({ isOpen, onClose }) => {
     const [notes, setNotes] = useState('');
     const [saving, setSaving] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const { toast, showToast, hideToast } = useToast();
 
     // Load notes when modal opens
@@ -55,6 +57,15 @@ const NotesModal = ({ isOpen, onClose }) => {
         }
     };
 
+    const handleDeleteConfirm = () => {
+        setNotes("");
+        setShowDeleteConfirm(false);
+    };
+
+    const handleDeleteCancel = () => {
+        setShowDeleteConfirm(false);
+    };
+
 
     if (!isOpen) return null;
     return (
@@ -63,15 +74,18 @@ const NotesModal = ({ isOpen, onClose }) => {
             <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
                 <div className="bg-black border border-stone-700 rounded-xl shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col">
                     <div className="flex items-center justify-between p-4 border-b border-stone-700">
-                        <div className="flex items-center gap-2">
-                            <FileText className="w-5 h-5 text-green-500" />
-                            <h2 className="text-lg font-semibold text-white">Muistiinpanot</h2>
-                        </div>
+                        <button
+                            className='hover:text-red-700 text-red-600 duration-500 px-2 py-1 text-sm font-bold'
+                            onClick={() => setShowDeleteConfirm(true)}
+                        >
+                            <Trash2 size={22} />
+                        </button>
+                        <h2 className="text-lg font-semibold text-white">Muistiinpanot</h2>
                         <button
                             onClick={onClose}
                             className="text-stone-400 hover:text-white duration-500 p-1 rounded"
                         >
-                            <X className="w-5 h-5" />
+                            <X size={22} />
                         </button>
                     </div>
                     <div className="flex-1 p-4">
@@ -83,7 +97,7 @@ const NotesModal = ({ isOpen, onClose }) => {
                         />
                     </div>
                     <div className="flex justify-end gap-2 p-4 border-t border-stone-700">
-                        <button className='hover:text-red-700 text-red-600 duration-500 border border-red-600 hover:border-red-700 rounded-lg px-2 py-1 text-sm font-bold' onClick={() => setNotes("")}>Tyhjennä</button>
+
                         <button
                             onClick={handleSave}
                             disabled={saving}
@@ -100,6 +114,11 @@ const NotesModal = ({ isOpen, onClose }) => {
                 type={toast.type}
                 isVisible={toast.isVisible}
                 onClose={hideToast}
+            />
+            <DeleteConfirmationModal
+                isOpen={showDeleteConfirm}
+                onConfirm={handleDeleteConfirm}
+                onCancel={handleDeleteCancel}
             />
         </>
     );
