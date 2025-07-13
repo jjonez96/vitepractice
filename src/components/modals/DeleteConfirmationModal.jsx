@@ -9,7 +9,7 @@ const DeleteConfirmationModal = ({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-60">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-90">
             <div className="bg-black border border-stone-700 p-3 rounded-xl shadow-lg max-w-xs w-full text-center mx-4">
                 <h3 className="text-lg font-bold mb-2 text-white">{title}</h3>
                 <div className="flex justify-center gap-4 mt-2">

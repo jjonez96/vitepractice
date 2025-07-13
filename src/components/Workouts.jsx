@@ -167,7 +167,7 @@ const Workouts = () => {
                         <div className="flex justify-between items-center mb-3">
                             <div className="font-bold text-white-400 flex items-center justify-center text-center text-sm">{formatFinnishDate(w.date)}</div>
                             <button
-                                className="hover:text-white text-stone-300 duration-500 hover:border-white text-xs px-2 py-1 rounded shadow flex items-center gap-1"
+                                className="text-green-500 hover:text-green-300 duration-500 text-xs px-2 py-1 rounded shadow flex items-center gap-1"
                                 onClick={() => handleEdit(w.id)}
                             >
                                 <Edit3 size={22} />

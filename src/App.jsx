@@ -21,14 +21,14 @@ function App() {
           <div className="ml-auto flex gap-1">
             <button
               onClick={() => setIsNotesModalOpen(true)}
-              className="hover:text-slate-100 hover:bg-[#1d1d1d] rounded-md text-stone-300 duration-500 p-2 focus:bg-[#1d1d1d]"
+              className="text-green-500 hover:text-green-300 hover:bg-[#1d1d1d] rounded-md duration-500 p-2 focus:bg-[#1d1d1d]"
               title="Muistiinpanot"
             >
               <FileText className="w-5 h-5" />
             </button>
             <button
               onClick={() => setIsSettingsModalOpen(true)}
-              className="hover:text-slate-100 hover:bg-[#1d1d1d] rounded-md text-stone-300 duration-500 p-2 focus:bg-[#1d1d1d]"
+              className="text-green-500 hover:text-green-300 hover:bg-[#1d1d1d] rounded-md duration-500 p-2 focus:bg-[#1d1d1d]"
               title="Asetukset"
             >
               <Settings className="w-5 h-5" />

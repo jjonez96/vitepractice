@@ -43,11 +43,11 @@ const SettingsModal = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={onClose} />
+            <div className="fixed inset-0 bg-black bg-opacity-90 z-40" onClick={onClose} />
             <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
                 <div className="bg-black border border-stone-700 rounded-xl shadow-xl w-full max-w-md flex flex-col">
                     <div className="flex items-center justify-between p-4 border-b border-stone-700">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
                             <Settings className="w-5 h-5 text-green-500" />
                             <h2 className="text-lg font-semibold text-white">Asetukset</h2>
                         </div>

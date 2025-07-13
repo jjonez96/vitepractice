@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Save, Trash2 } from 'lucide-react';
+import { X, Save, Trash2, FileText } from 'lucide-react';
 import { db } from '../../db/dexie';
 import { useToast } from '../../hooks/useToast';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
@@ -70,7 +70,7 @@ const NotesModal = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
     return (
         <>
-            <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={onClose} />
+            <div className="fixed inset-0 bg-black bg-opacity-90 z-40" onClick={onClose} />
             <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
                 <div className="bg-black border border-stone-700 rounded-xl shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col">
                     <div className="flex items-center justify-between p-4 border-b border-stone-700">
@@ -80,7 +80,11 @@ const NotesModal = ({ isOpen, onClose }) => {
                         >
                             <Trash2 size={22} />
                         </button>
-                        <h2 className="text-lg font-semibold text-white">Muistiinpanot</h2>
+
+                        <div className="flex items-center gap-1">
+                            <FileText className="w-5 h-5 text-green-500" />
+                            <h2 className="text-lg font-semibold text-white">Muistiinpanot</h2>
+                        </div>
                         <button
                             onClick={onClose}
                             className="text-stone-400 hover:text-white duration-500 p-1 rounded"

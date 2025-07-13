@@ -80,7 +80,7 @@ const EditWorkoutModal = ({
     const isDisabled = !hasChanges();
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90 p-4">
             <div className="bg-black border border-stone-700 rounded-xl shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto mx-auto">
                 <div className="p-4">
 
