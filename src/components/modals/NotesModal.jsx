@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { X, Save, FileText } from 'lucide-react';
-import { db } from '../db/dexie';
-import { useToast } from '../hooks/useToast';
-import Toast from './Toast';
+import { db } from '../../db/dexie';
+import { useToast } from '../../hooks/useToast';
+import Toast from '../Toast';
 
 const NotesModal = ({ isOpen, onClose }) => {
     const [notes, setNotes] = useState('');

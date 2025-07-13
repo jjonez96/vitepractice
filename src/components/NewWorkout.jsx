@@ -3,7 +3,7 @@ import { saveWorkout } from "../utils/workoutUtils";
 import { useExerciseDropdown } from "../hooks/useExerciseDropdown";
 import { useExerciseInputs } from "../hooks/useExersiceData";
 import ExerciseSelector from "./ExerciseSelector";
-import ExerciseInputs from "./ExerciseInputs";
+import NumberInputs from "./NumberInputs";
 import NewExercise from "./NewExercise";
 import Toast from "./Toast";
 import { useToast } from "../hooks/useToast";
@@ -16,9 +16,8 @@ const NewWorkout = ({ onSaved }) => {
     const { toast, showToast, hideToast } = useToast();
 
     // Get exercise data and handlers
-    const { data, setData, handleSetChange, addExercise, removeSet } = useExerciseInputs();
+    const { data, setData, handleNumberInputs, addExercise, removeSet } = useExerciseInputs();
 
-    // Pass data and setData to dropdown hook
     const {
         dropdownIdx,
         search,
@@ -28,6 +27,16 @@ const NewWorkout = ({ onSaved }) => {
         handleSearchChange,
         inputRefs
     } = useExerciseDropdown(data, setData);
+
+    const handleAddExercise = async () => {
+        await addExercise(inputRefs);
+    };
+
+    const handleRemoveSet = (idx) => {
+        removeSet(idx, inputRefs);
+        const updatedData = data.filter((_, i) => i !== idx);
+        localStorage.setItem("nw_data", JSON.stringify(updatedData));
+    };
 
     const handleSubmit = async e => {
         e.preventDefault();
@@ -49,6 +58,15 @@ const NewWorkout = ({ onSaved }) => {
         } finally {
             setSaving(false);
         }
+    };
+
+    // Check if all required fields are filled for at least one exercise
+    const isFormValid = () => {
+        return data.some(set =>
+            set.exercise && set.exercise.trim() !== "" &&
+            set.sets && set.sets.toString().trim() !== "" &&
+            set.reps && set.reps.toString().trim() !== ""
+        );
     };
 
     return (
@@ -74,15 +92,15 @@ const NewWorkout = ({ onSaved }) => {
                                         search={search}
                                         handleSelectExercise={handleSelectExercise}
                                     />
-                                    <ExerciseInputs
+                                    <NumberInputs
                                         idx={idx}
                                         set={set}
-                                        handleSetChange={handleSetChange}
+                                        handleNumberInputs={handleNumberInputs}
                                     />
                                     {data.length > 1 && (
                                         <button
                                             type="button"
-                                            onClick={() => removeSet(idx)}
+                                            onClick={() => handleRemoveSet(idx)}
                                             className="hover:text-red-700 text-red-600 duration-500   rounded absolute top-1 right-2 z-10 hover:text-red-600"
                                             aria-label="Remove exercise"
                                         >
@@ -94,10 +112,17 @@ const NewWorkout = ({ onSaved }) => {
                         })}
                     </div>
                     <div className="pt-6">
-                        <NewExercise addExercise={addExercise} />
+                        <NewExercise addExercise={handleAddExercise} />
                     </div>
                 </div>
-                <button type="submit" disabled={saving} className=" text-green-400 duration-500 border border-green-600 hover:border-green-400 text-sm py-2 rounded-lg font-bold w-full flex items-center justify-center gap-2">
+                <button
+                    type="submit"
+                    disabled={saving || !isFormValid()}
+                    className={`duration-500 border text-sm py-2 rounded-lg font-bold w-full flex items-center justify-center gap-2 ${saving || !isFormValid()
+                        ? 'text-stone-500 border-stone-700 cursor-not-allowed'
+                        : 'text-green-400 border-green-600 hover:border-green-400'
+                        }`}
+                >
                     {saving ? (
                         "Ladataan..."
                     ) : (

@@ -39,6 +39,7 @@ const ExerciseSelector = ({
                 value={set.exercise}
                 onChange={e => handleSearchChange(idx, e.target.value)}
                 onFocus={() => handleDropdown(idx)}
+
                 className="border border-stone-700 bg-black rounded px-2 py-1 w-full text-gray-100"
                 required
             />
@@ -51,7 +52,7 @@ const ExerciseSelector = ({
                         <div
                             key={ex.name}
                             onClick={() => handleSelectExercise(idx, getDisplayName(ex))}
-                            className="p-2 hover:bg-green-900 cursor-pointer flex-col transition-colors duration-200"
+                            className="p-2 hover:bg-green-900 cursor-pointer flex-col transition-colors duration-200 "
                         >
                             <div className="flex justify-between items-center">
                                 <h3 className="text-sm font-semibold text-white">

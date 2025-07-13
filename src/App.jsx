@@ -2,8 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { useState } from "react";
 import Workouts from "./components/Workouts";
 import WorkoutForm from "./components/NewWorkout";
-import NotesModal from "./components/NotesModal";
-import SettingsModal from "./components/SettingsModal";
+import NotesModal from "./components/modals/NotesModal";
+import SettingsModal from "./components/modals/SettingsModal";
 import { Dumbbell, FileText, Settings } from "lucide-react";
 import "./App.css";
 

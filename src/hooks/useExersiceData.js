@@ -33,6 +33,7 @@ const getInitialData = async () => {
 
 export function useExerciseInputs() {
     const [data, setData] = useState([{ exercise: "", reps: "", sets: "", weight: "" }]);
+    const [editingRowIdx, setEditingRowIdx] = useState(null); // Track which row is being edited
 
     // Initialize data asynchronously
     useEffect(() => {
@@ -43,43 +44,64 @@ export function useExerciseInputs() {
         initializeData();
     }, []);
 
-    const handleSetChange = (idx, field, value) => {
+    const handleNumberInputs = (idx, field, value) => {
         setData(data => {
             const newData = data.map((set, i) => i === idx ? { ...set, [field]: value } : set);
-            localStorage.setItem("nw_data", JSON.stringify(newData));
             return newData;
         });
     };
 
-    const addExercise = async () => {
+    const addExercise = async (inputRefs) => {
         const defaultExercise = await getDefaultExercise();
         setData(prev => {
             const newData = [...prev, defaultExercise];
-            localStorage.setItem("nw_data", JSON.stringify(newData));
             return newData;
         });
+        const newIndex = data.length;
+        setEditingRowIdx(newIndex - 0);
+
+        setTimeout(() => {
+            if (inputRefs.current[newIndex]) {
+                inputRefs.current[newIndex].focus();
+
+            }
+        }, 100);
     };
 
-    const removeSet = idx => {
+    const removeSet = (idx, inputRefs) => {
         setData(data => {
             const newData = data.filter((_, i) => i !== idx);
-            localStorage.setItem("nw_data", JSON.stringify(newData));
             return newData;
         });
-    };
+        // After removal, check if there are any empty rows to focus on
+        setTimeout(() => {
+            const updatedData = data.filter((_, i) => i !== idx);
 
-    const resetData = async () => {
-        const defaultExercise = await getDefaultExercise();
-        setData([defaultExercise]);
-        localStorage.removeItem("nw_data");
+            // Find the first empty row (exercise field is empty)
+            const emptyRowIndex = updatedData.findIndex(set => !set.exercise || set.exercise.trim() === '');
+
+            if (emptyRowIndex !== -1) {
+                // Focus on the first empty row found
+                setEditingRowIdx(emptyRowIndex);
+                setTimeout(() => {
+                    if (inputRefs.current[emptyRowIndex]) {
+                        inputRefs.current[emptyRowIndex].focus();
+                    }
+                }, 50);
+            } else {
+                // No empty rows, don't focus on any row
+                setEditingRowIdx(null);
+            }
+        }, 50);
     };
 
     return {
         data,
+        editingRowIdx,
         setData,
-        handleSetChange,
+        handleNumberInputs,
         addExercise,
         removeSet,
-        resetData
+        setEditingRowIdx,
     };
 }

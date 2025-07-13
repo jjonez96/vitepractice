@@ -90,3 +90,9 @@ export const refreshWorkoutData = async () => {
     });
     return { workouts, setsByWorkout };
 };
+
+export const formatFinnishDate = (isoDate) => {
+    if (!isoDate) return "";
+    const [year, month, day] = isoDate.split("-");
+    return `${day}.${month}.${year}`;
+};

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, Save, Settings } from 'lucide-react';
-import { useSettings } from '../hooks/useSettings';
+import { useSettings } from '../../hooks/useSettings';
 
 const SettingsModal = ({ isOpen, onClose }) => {
     const { settings, updateSettings } = useSettings();
