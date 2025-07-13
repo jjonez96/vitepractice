@@ -57,7 +57,6 @@ const NotesModal = ({ isOpen, onClose }) => {
 
 
     if (!isOpen) return null;
-
     return (
         <>
             <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={onClose} />
@@ -84,6 +83,7 @@ const NotesModal = ({ isOpen, onClose }) => {
                         />
                     </div>
                     <div className="flex justify-end gap-2 p-4 border-t border-stone-700">
+                        <button className='hover:text-red-700 text-red-600 duration-500 border border-red-600 hover:border-red-700 rounded-lg px-2 py-1 text-sm font-bold' onClick={() => setNotes("")}>Tyhjennä</button>
                         <button
                             onClick={handleSave}
                             disabled={saving}

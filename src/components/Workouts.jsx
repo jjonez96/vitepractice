@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Trash2, Edit3, X, CalendarArrowUp, CalendarArrowDown } from "lucide-react";
+import { Edit3, CalendarArrowUp, CalendarArrowDown } from "lucide-react";
 import { db } from "../db/dexie";
 import { saveWorkout, refreshWorkoutData, formatFinnishDate } from "../utils/workoutUtils";
 import EditWorkoutModal from "./modals/EditWorkoutModal";
@@ -36,7 +36,6 @@ const Workouts = () => {
         handleSearchChange,
         inputRefs
     } = useExerciseDropdown(data, setData, false);
-
 
     useEffect(() => {
         const fetchData = async () => {
@@ -125,6 +124,7 @@ const Workouts = () => {
             setData([]);
             setEditingRowIdx(null);
             setNoteByWorkout({});
+            setShowNoteForWorkout(null);
             setEditDate("");
             showToast("Treeni tallennettu onnistuneesti!", "success");
         } catch (err) {
@@ -166,10 +166,10 @@ const Workouts = () => {
                     <div className="flex justify-between items-center mb-3">
                         <div className="font-bold text-white-400 flex items-center justify-center text-center text-sm">{formatFinnishDate(w.date)}</div>
                         <button
-                            className="hover:text-white text-stone-400 duration-500 border border-stone-400 hover:border-white text-xs px-2 py-1 rounded shadow flex items-center gap-1"
+                            className="hover:text-white text-stone-300 duration-500 hover:border-white text-xs px-2 py-1 rounded shadow flex items-center gap-1"
                             onClick={() => handleEdit(w.id)}
                         >
-                            <Edit3 size={20} />
+                            <Edit3 size={25} />
                         </button>
                     </div>
                     <div className="border border-stone-700 rounded-lg overflow-x-auto">

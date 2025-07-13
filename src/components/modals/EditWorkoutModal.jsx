@@ -64,7 +64,7 @@ const EditWorkoutModal = ({
             const current = data[i];
             const original = originalData[i];
 
-            if (!original) return true; // New exercise added
+            if (!original) return true;
 
             if (current.exercise !== original.exercise ||
                 current.sets !== original.sets ||
@@ -99,7 +99,7 @@ const EditWorkoutModal = ({
                             onChange={e => setEditDate(e.target.value)}
                         />
                         <button
-                            className="hover:text-white text-stone-400 duration-500"
+                            className="hover:text-white text-stone-300 duration-500"
                             onClick={onClose}
                         >
                             <X size={24} />
@@ -125,7 +125,7 @@ const EditWorkoutModal = ({
                                         <td className="px-4 py-3 text-center">{s.exercise}</td>
                                         <td className="px-4 py-3 text-center">{s.sets}</td>
                                         <td className="px-4 py-3 text-center">{s.reps}</td>
-                                        <td className="px-4 py-3 text-center">{s.weight === 0 ? '-' : s.weight}</td>
+                                        <td className="px-4 py-3 text-center">{!s.weight || s.weight === 0 || s.weight === "0" || s.weight === "" ? '-' : s.weight}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -164,7 +164,7 @@ const EditWorkoutModal = ({
                     ) : null}
 
                     <div className="mb-4 flex justify-between items-center">
-                        <NewExercise addExercise={handleAddExercise} />
+                        <NewExercise addExercise={handleAddExercise} data={data} />
                         <button
                             onClick={() => toggleNote(editingWorkoutId)}
                             className="hover:text-green-300 text-green-500 duration-500 hover:border-white text-xs"

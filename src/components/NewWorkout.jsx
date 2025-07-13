@@ -112,7 +112,7 @@ const NewWorkout = ({ onSaved }) => {
                         })}
                     </div>
                     <div className="pt-6">
-                        <NewExercise addExercise={handleAddExercise} />
+                        <NewExercise addExercise={handleAddExercise} data={data} />
                     </div>
                 </div>
                 <button

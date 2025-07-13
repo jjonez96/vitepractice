@@ -68,31 +68,11 @@ export function useExerciseInputs() {
         }, 100);
     };
 
-    const removeSet = (idx, inputRefs) => {
+    const removeSet = (idx) => {
         setData(data => {
             const newData = data.filter((_, i) => i !== idx);
             return newData;
         });
-        // After removal, check if there are any empty rows to focus on
-        setTimeout(() => {
-            const updatedData = data.filter((_, i) => i !== idx);
-
-            // Find the first empty row (exercise field is empty)
-            const emptyRowIndex = updatedData.findIndex(set => !set.exercise || set.exercise.trim() === '');
-
-            if (emptyRowIndex !== -1) {
-                // Focus on the first empty row found
-                setEditingRowIdx(emptyRowIndex);
-                setTimeout(() => {
-                    if (inputRefs.current[emptyRowIndex]) {
-                        inputRefs.current[emptyRowIndex].focus();
-                    }
-                }, 50);
-            } else {
-                // No empty rows, don't focus on any row
-                setEditingRowIdx(null);
-            }
-        }, 50);
     };
 
     return {

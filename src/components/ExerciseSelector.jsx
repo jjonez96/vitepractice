@@ -32,7 +32,7 @@ const ExerciseSelector = ({
 
     return (
         <div className="flex-1 w-full mb-2 relative">
-            <label className="block text-sm mb-1">Liike</label>
+            <label className="block text-sm mb-1">Liike <span className="text-red-500">*</span></label>
             <input
                 ref={el => (inputRefs.current[idx] = el)}
                 type="text"
