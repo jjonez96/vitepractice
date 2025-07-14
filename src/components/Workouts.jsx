@@ -230,6 +230,7 @@ const Workouts = () => {
                 originalNote={originalNote}
                 handleRowClick={handleRowClick}
                 editingRowIdx={editingRowIdx}
+                setEditingRowIdx={setEditingRowIdx}
                 inputRefs={inputRefs}
                 handleSearchChange={handleSearchChange}
                 handleDropdown={handleDropdown}

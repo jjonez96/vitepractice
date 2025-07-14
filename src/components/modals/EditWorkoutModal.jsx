@@ -20,6 +20,7 @@ const EditWorkoutModal = ({
     originalNote,
     handleRowClick,
     editingRowIdx,
+    setEditingRowIdx,
     inputRefs,
     handleSearchChange,
     handleDropdown,
@@ -86,7 +87,7 @@ const EditWorkoutModal = ({
 
                     <div className="mb-4 flex justify-between items-center">
                         <button
-                            className="hover:text-red-700 text-red-600 duration-500 px-2 py-1 flex items-center gap-1"
+                            className="hover:text-red-700 text-red-600 duration-500 py-1 flex items-center "
                             onClick={() => setConfirmDeleteId(editingWorkoutId)}
                             type="button"
                         >
@@ -164,7 +165,12 @@ const EditWorkoutModal = ({
                     ) : null}
 
                     <div className="mb-4 flex justify-between items-center">
-                        <NewExercise addExercise={handleAddExercise} data={data} />
+                        <NewExercise
+                            addExercise={handleAddExercise}
+                            data={data}
+                            editingRowIdx={editingRowIdx}
+                            setEditingRowIdx={setEditingRowIdx}
+                        />
                         <button
                             onClick={() => toggleNote(editingWorkoutId)}
                             className="hover:text-green-300 text-green-500 duration-500 hover:border-white text-xs"
