@@ -15,11 +15,11 @@ const NumberInputs = ({ idx, set, handleNumberInputs }) => {
             <div className="flex flex-col min-w-[20px] flex-1">
                 <label className="block text-sm mb-1">Toistot <span className="text-red-500">*</span></label>
                 <input
-                    type="number"
-                    min="0"
+                    type="text"
                     value={set.reps}
                     onChange={e => handleNumberInputs(idx, "reps", e.target.value)}
                     className="border border-stone-700 bg-black text-gray-100 px-2 py-1 w-full text-center rounded"
+                    placeholder="8 tai 8,7"
                     required
                 />
             </div>

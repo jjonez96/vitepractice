@@ -9,13 +9,13 @@ export const saveWorkout = async (workoutData, isEditing = false) => {
         throw new Error("Täytä kaikki kentät ennen tallentamista 📝");
     }
 
-    const negativeSets = sets.filter(s => Number(s.reps) < 0 || Number(s.sets) < 0 || Number(s.weight) < 0);
+    const negativeSets = sets.filter(s => Number(s.sets) < 0 || Number(s.weight) < 0);
     if (negativeSets.length > 0) {
         throw new Error("Negatiiviset arvot eivät ole sallittuja ❌");
     }
 
     const invalidNumbers = sets.filter(s =>
-        isNaN(Number(s.reps)) || isNaN(Number(s.sets)) ||
+        isNaN(Number(s.sets)) ||
         (s.weight !== "" && isNaN(Number(s.weight)))
     );
     if (invalidNumbers.length > 0) {
@@ -39,7 +39,7 @@ export const saveWorkout = async (workoutData, isEditing = false) => {
             if (s.id) {
                 await db.data.update(s.id, {
                     exercise: s.exercise,
-                    reps: Number(s.reps),
+                    reps: s.reps,
                     sets: Number(s.sets),
                     weight: Number(s.weight)
                 });
@@ -47,7 +47,7 @@ export const saveWorkout = async (workoutData, isEditing = false) => {
                 // New row, add to DB
                 await db.data.add({
                     exercise: s.exercise,
-                    reps: Number(s.reps),
+                    reps: s.reps,
                     sets: Number(s.sets),
                     weight: Number(s.weight),
                     workoutId: workoutId
@@ -70,7 +70,7 @@ export const saveWorkout = async (workoutData, isEditing = false) => {
         for (const s of sets.filter(s => s.exercise && s.reps && s.sets)) {
             await db.data.add({
                 exercise: s.exercise,
-                reps: Number(s.reps),
+                reps: s.reps,
                 sets: Number(s.sets),
                 weight: Number(s.weight) || 0,
                 workoutId: newWorkoutId
