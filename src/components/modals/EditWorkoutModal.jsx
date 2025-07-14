@@ -5,6 +5,7 @@ import {
     closestCenter,
     KeyboardSensor,
     PointerSensor,
+    TouchSensor,
     useSensor,
     useSensors,
 } from '@dnd-kit/core';
@@ -49,11 +50,11 @@ const SortableTableRow = ({ exercise, index, handleRowClick, isLast }) => {
         >
             <td className="px-2 py-3 text-center">
                 <div
-                    className="flex justify-center cursor-grab active:cursor-grabbing"
+                    className="flex justify-center cursor-grab active:cursor-grabbing touch-manipulation p-2 -m-2"
                     {...attributes}
                     {...listeners}
                 >
-                    <GripVertical size={16} className="text-stone-500" />
+                    <GripVertical size={20} className="text-stone-500" />
                 </div>
             </td>
             <td className="px-4 py-3 text-center">{exercise.exercise}</td>
@@ -100,7 +101,17 @@ const EditWorkoutModal = ({
     const textareaRef = useRef(null);
 
     const sensors = useSensors(
-        useSensor(PointerSensor),
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8,
+            },
+        }),
+        useSensor(TouchSensor, {
+            activationConstraint: {
+                delay: 200,
+                tolerance: 5,
+            },
+        }),
         useSensor(KeyboardSensor, {
             coordinateGetter: sortableKeyboardCoordinates,
         })
