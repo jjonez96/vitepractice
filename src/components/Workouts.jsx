@@ -225,6 +225,7 @@ const Workouts = () => {
                 showNoteForWorkout={showNoteForWorkout}
                 toggleNote={toggleNote}
                 data={data}
+                setData={setData}
                 originalData={originalData}
                 originalDate={originalDate}
                 originalNote={originalNote}

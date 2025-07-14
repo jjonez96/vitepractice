@@ -1,8 +1,70 @@
 import { useRef, useEffect } from "react";
-import { Trash2, X, Save, NotebookPen } from "lucide-react";
+import { Trash2, X, Save, NotebookPen, GripVertical } from "lucide-react";
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+} from '@dnd-kit/core';
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import {
+    useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import ExerciseSelector from "../ExerciseSelector";
 import NumberInputs from "../NumberInputs";
 import NewExercise from "../NewExercise";
+
+// Sortable table row component
+const SortableTableRow = ({ exercise, index, handleRowClick, isLast }) => {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({ id: exercise.id || `exercise-${index}` });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+    };
+
+    return (
+        <tr
+            ref={setNodeRef}
+            style={style}
+            className={`bg-black hover:bg-stone-900 transition-colors cursor-pointer ${!isLast ? 'border-b border-stone-700' : ''
+                }`}
+            onClick={() => handleRowClick(index)}
+        >
+            <td className="px-2 py-3 text-center">
+                <div
+                    className="flex justify-center cursor-grab active:cursor-grabbing"
+                    {...attributes}
+                    {...listeners}
+                >
+                    <GripVertical size={16} className="text-stone-500" />
+                </div>
+            </td>
+            <td className="px-4 py-3 text-center">{exercise.exercise}</td>
+            <td className="px-4 py-3 text-center">{exercise.sets}</td>
+            <td className="px-4 py-3 text-center">{exercise.reps}</td>
+            <td className="px-4 py-3 text-center">
+                {!exercise.weight || exercise.weight === 0 || exercise.weight === "0" || exercise.weight === "" ? '-' : exercise.weight}
+            </td>
+        </tr>
+    );
+};
 
 const EditWorkoutModal = ({
     isOpen,
@@ -15,6 +77,7 @@ const EditWorkoutModal = ({
     showNoteForWorkout,
     toggleNote,
     data,
+    setData,
     originalData,
     originalDate,
     originalNote,
@@ -35,6 +98,13 @@ const EditWorkoutModal = ({
     setConfirmDeleteId
 }) => {
     const textareaRef = useRef(null);
+
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
 
     // Focus textarea when note becomes visible
     useEffect(() => {
@@ -80,6 +150,27 @@ const EditWorkoutModal = ({
 
     const isDisabled = !hasChanges();
 
+    const handleDragEnd = (event) => {
+        const { active, over } = event;
+
+        if (active.id !== over?.id) {
+            const oldIndex = data.findIndex((item) => (item.id || `exercise-${data.indexOf(item)}`) === active.id);
+            const newIndex = data.findIndex((item) => (item.id || `exercise-${data.indexOf(item)}`) === over.id);
+
+            const newData = arrayMove(data, oldIndex, newIndex);
+            setData(newData);
+
+            // Update editing index if needed
+            if (editingRowIdx === oldIndex) {
+                setEditingRowIdx(newIndex);
+            } else if (editingRowIdx > oldIndex && editingRowIdx <= newIndex) {
+                setEditingRowIdx(editingRowIdx - 1);
+            } else if (editingRowIdx < oldIndex && editingRowIdx >= newIndex) {
+                setEditingRowIdx(editingRowIdx + 1);
+            }
+        }
+    };
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90 p-4">
             <div className="bg-black border border-stone-700 rounded-xl shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto mx-auto">
@@ -107,30 +198,39 @@ const EditWorkoutModal = ({
                         </button>
                     </div>
                     <div className="border border-stone-700 rounded-lg overflow-x-auto mb-6">
-                        <table className="w-full text-xs table-auto">
-                            <thead>
-                                <tr className="bg-black text-stone-100 border-b border-green-600">
-                                    <th className="py-2 rounded-tl-lg">Liike</th>
-                                    <th className="py-2">Sarjat</th>
-                                    <th className="py-2">Toistot</th>
-                                    <th className="py-2 rounded-tr-lg">Paino</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {data.map((s, i, arr) => (
-                                    <tr
-                                        key={s.id ? `id-${s.id}` : `new-${i}`}
-                                        className={`bg-black hover:bg-stone-900 transition-colors cursor-pointer ${i < arr.length - 1 ? 'border-b border-stone-700' : ''}`}
-                                        onClick={() => handleRowClick(i)}
-                                    >
-                                        <td className="px-4 py-3 text-center">{s.exercise}</td>
-                                        <td className="px-4 py-3 text-center">{s.sets}</td>
-                                        <td className="px-4 py-3 text-center">{s.reps}</td>
-                                        <td className="px-4 py-3 text-center">{!s.weight || s.weight === 0 || s.weight === "0" || s.weight === "" ? '-' : s.weight}</td>
+                        <DndContext
+                            sensors={sensors}
+                            collisionDetection={closestCenter}
+                            onDragEnd={handleDragEnd}
+                        >
+                            <table className="w-full text-xs table-auto">
+                                <thead>
+                                    <tr className="bg-black text-stone-100 border-b border-green-600">
+                                        <th className="py-2 w-8"></th>
+                                        <th className="py-2 rounded-tl-lg">Liike</th>
+                                        <th className="py-2">Sarjat</th>
+                                        <th className="py-2">Toistot</th>
+                                        <th className="py-2 rounded-tr-lg">Paino</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <SortableContext
+                                        items={data.map((item, index) => item.id || `exercise-${index}`)}
+                                        strategy={verticalListSortingStrategy}
+                                    >
+                                        {data.map((exercise, index) => (
+                                            <SortableTableRow
+                                                key={exercise.id || `exercise-${index}`}
+                                                exercise={exercise}
+                                                index={index}
+                                                handleRowClick={handleRowClick}
+                                                isLast={index === data.length - 1}
+                                            />
+                                        ))}
+                                    </SortableContext>
+                                </tbody>
+                            </table>
+                        </DndContext>
                     </div>
 
                     {editingRowIdx !== null && data[editingRowIdx] ? (
