@@ -1,71 +1,8 @@
 import { useRef, useEffect } from "react";
-import { Trash2, X, Save, NotebookPen, GripVertical } from "lucide-react";
-import {
-    DndContext,
-    closestCenter,
-    KeyboardSensor,
-    PointerSensor,
-    TouchSensor,
-    useSensor,
-    useSensors,
-} from '@dnd-kit/core';
-import {
-    arrayMove,
-    SortableContext,
-    sortableKeyboardCoordinates,
-    verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import {
-    useSortable,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import { Trash2, X, Save, NotebookPen, ChevronUp, ChevronDown } from "lucide-react";
 import ExerciseSelector from "../ExerciseSelector";
 import NumberInputs from "../NumberInputs";
 import NewExercise from "../NewExercise";
-
-// Sortable table row component
-const SortableTableRow = ({ exercise, index, handleRowClick, isLast }) => {
-    const {
-        attributes,
-        listeners,
-        setNodeRef,
-        transform,
-        transition,
-        isDragging,
-    } = useSortable({ id: exercise.id || `exercise-${index}` });
-
-    const style = {
-        transform: CSS.Transform.toString(transform),
-        transition,
-        opacity: isDragging ? 0.5 : 1,
-    };
-
-    return (
-        <tr
-            ref={setNodeRef}
-            style={style}
-            className={`bg-black hover:bg-stone-900 transition-colors cursor-pointer ${!isLast ? 'border-b border-stone-700' : ''
-                }`}
-            onClick={() => handleRowClick(index)}
-        >
-            <td className="px-2 py-3 text-center">
-                <div
-                    className="flex justify-center cursor-grab active:cursor-grabbing touch-manipulation p-2 -m-2"
-                    {...attributes}
-                    {...listeners}
-                >
-                    <GripVertical size={20} className="text-stone-500" />
-                </div>
-            </td>
-            <td className="px-4 py-3 text-center">{exercise.exercise}</td>
-            <td className="px-4 py-3 text-center">{exercise.sets}</td>
-            <td className="px-4 py-3 text-center">{exercise.reps}</td>
-            <td className="px-4 py-3 text-center">
-                {!exercise.weight || exercise.weight === 0 || exercise.weight === "0" || exercise.weight === "" ? '-' : exercise.weight}
-            </td>
-        </tr>
-    );
-};
 
 const EditWorkoutModal = ({
     isOpen,
@@ -99,23 +36,6 @@ const EditWorkoutModal = ({
     setConfirmDeleteId
 }) => {
     const textareaRef = useRef(null);
-
-    const sensors = useSensors(
-        useSensor(PointerSensor, {
-            activationConstraint: {
-                distance: 8,
-            },
-        }),
-        useSensor(TouchSensor, {
-            activationConstraint: {
-                delay: 200,
-                tolerance: 5,
-            },
-        }),
-        useSensor(KeyboardSensor, {
-            coordinateGetter: sortableKeyboardCoordinates,
-        })
-    );
 
     // Focus textarea when note becomes visible
     useEffect(() => {
@@ -161,23 +81,36 @@ const EditWorkoutModal = ({
 
     const isDisabled = !hasChanges();
 
-    const handleDragEnd = (event) => {
-        const { active, over } = event;
-
-        if (active.id !== over?.id) {
-            const oldIndex = data.findIndex((item) => (item.id || `exercise-${data.indexOf(item)}`) === active.id);
-            const newIndex = data.findIndex((item) => (item.id || `exercise-${data.indexOf(item)}`) === over.id);
-
-            const newData = arrayMove(data, oldIndex, newIndex);
+    // Move exercise up in the list
+    const moveExerciseUp = (index, e) => {
+        e.stopPropagation(); // Prevent row click
+        if (index > 0) {
+            const newData = [...data];
+            [newData[index], newData[index - 1]] = [newData[index - 1], newData[index]];
             setData(newData);
 
             // Update editing index if needed
-            if (editingRowIdx === oldIndex) {
-                setEditingRowIdx(newIndex);
-            } else if (editingRowIdx > oldIndex && editingRowIdx <= newIndex) {
-                setEditingRowIdx(editingRowIdx - 1);
-            } else if (editingRowIdx < oldIndex && editingRowIdx >= newIndex) {
-                setEditingRowIdx(editingRowIdx + 1);
+            if (editingRowIdx === index) {
+                setEditingRowIdx(index - 1);
+            } else if (editingRowIdx === index - 1) {
+                setEditingRowIdx(index);
+            }
+        }
+    };
+
+    // Move exercise down in the list
+    const moveExerciseDown = (index, e) => {
+        e.stopPropagation(); // Prevent row click
+        if (index < data.length - 1) {
+            const newData = [...data];
+            [newData[index], newData[index + 1]] = [newData[index + 1], newData[index]];
+            setData(newData);
+
+            // Update editing index if needed
+            if (editingRowIdx === index) {
+                setEditingRowIdx(index + 1);
+            } else if (editingRowIdx === index + 1) {
+                setEditingRowIdx(index);
             }
         }
     };
@@ -209,39 +142,59 @@ const EditWorkoutModal = ({
                         </button>
                     </div>
                     <div className="border border-stone-700 rounded-lg overflow-x-auto mb-6">
-                        <DndContext
-                            sensors={sensors}
-                            collisionDetection={closestCenter}
-                            onDragEnd={handleDragEnd}
-                        >
-                            <table className="w-full text-xs table-auto">
-                                <thead>
-                                    <tr className="bg-black text-stone-100 border-b border-green-600">
-                                        <th className="py-2 w-8"></th>
-                                        <th className="py-2 rounded-tl-lg">Liike</th>
-                                        <th className="py-2">Sarjat</th>
-                                        <th className="py-2">Toistot</th>
-                                        <th className="py-2 rounded-tr-lg">Paino</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <SortableContext
-                                        items={data.map((item, index) => item.id || `exercise-${index}`)}
-                                        strategy={verticalListSortingStrategy}
+                        <table className="w-full text-xs table-auto">
+                            <thead>
+                                <tr className="bg-black text-stone-100 border-b border-green-600">
+                                    <th className="py-2 w-8 rounded-tl-lg"></th>
+                                    <th className="py-2">Liike</th>
+                                    <th className="py-2">Sarjat</th>
+                                    <th className="py-2">Toistot</th>
+                                    <th className="py-2 rounded-tr-lg">Paino</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {data.map((exercise, index) => (
+                                    <tr
+                                        key={index}
+                                        className={`bg-black hover:bg-stone-900 transition-colors cursor-pointer ${index !== data.length - 1 ? 'border-b border-stone-700' : ''}`}
+                                        onClick={() => handleRowClick(index)}
                                     >
-                                        {data.map((exercise, index) => (
-                                            <SortableTableRow
-                                                key={exercise.id || `exercise-${index}`}
-                                                exercise={exercise}
-                                                index={index}
-                                                handleRowClick={handleRowClick}
-                                                isLast={index === data.length - 1}
-                                            />
-                                        ))}
-                                    </SortableContext>
-                                </tbody>
-                            </table>
-                        </DndContext>
+                                        <td className="px-2 py-2 text-center">
+                                            <div className="flex flex-col ">
+                                                <button
+                                                    onClick={(e) => moveExerciseUp(index, e)}
+                                                    disabled={index === 0}
+                                                    className={`${index === 0
+                                                        ? 'text-stone-600 cursor-not-allowed'
+                                                        : 'text-green-400 hover:text-green-400'
+                                                        }`}
+                                                    aria-label="Move up"
+                                                >
+                                                    <ChevronUp size={20} />
+                                                </button>
+                                                <button
+                                                    onClick={(e) => moveExerciseDown(index, e)}
+                                                    disabled={index === data.length - 1}
+                                                    className={`${index === data.length - 1
+                                                        ? 'text-stone-600 cursor-not-allowed'
+                                                        : 'text-green-400 hover:text-green-400'
+                                                        }`}
+                                                    aria-label="Move down"
+                                                >
+                                                    <ChevronDown size={20} />
+                                                </button>
+                                            </div>
+                                        </td>
+                                        <td className="px-1 py-1 text-center">{exercise.exercise}</td>
+                                        <td className="px-2 py-1 text-center">{exercise.sets}</td>
+                                        <td className="px-2 py-1 text-center">{exercise.reps}</td>
+                                        <td className="px-2 py-1 text-center">
+                                            {!exercise.weight || exercise.weight === 0 || exercise.weight === "0" || exercise.weight === "" ? '-' : exercise.weight}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
 
                     {editingRowIdx !== null && data[editingRowIdx] ? (
