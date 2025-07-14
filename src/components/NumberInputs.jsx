@@ -28,6 +28,7 @@ const NumberInputs = ({ idx, set, handleNumberInputs }) => {
                 <input
                     type="number"
                     min="0"
+                    step="0.1"
                     value={set.weight}
                     onChange={e => handleNumberInputs(idx, "weight", e.target.value)}
                     className="border border-stone-700 bg-black text-gray-100 px-2 py-1 w-full text-center rounded"
