@@ -35,13 +35,15 @@ export const saveWorkout = async (workoutData, isEditing = false) => {
         }
 
         // Update or add sets
-        for (const s of sets) {
+        for (let i = 0; i < sets.length; i++) {
+            const s = sets[i];
             if (s.id) {
                 await db.data.update(s.id, {
                     exercise: s.exercise,
                     reps: s.reps,
                     sets: Number(s.sets),
-                    weight: Number(s.weight)
+                    weight: Number(s.weight),
+                    order: i // Add order field to preserve exercise order
                 });
             } else {
                 // New row, add to DB
@@ -50,7 +52,8 @@ export const saveWorkout = async (workoutData, isEditing = false) => {
                     reps: s.reps,
                     sets: Number(s.sets),
                     weight: Number(s.weight),
-                    workoutId: workoutId
+                    workoutId: workoutId,
+                    order: i // Add order field for new exercises
                 });
             }
         }
@@ -67,14 +70,18 @@ export const saveWorkout = async (workoutData, isEditing = false) => {
         const newWorkoutId = await db.workouts.add({ date, note: note || "" });
 
         // Add sets one by one to avoid bulk errors
-        for (const s of sets.filter(s => s.exercise && s.reps && s.sets)) {
-            await db.data.add({
-                exercise: s.exercise,
-                reps: s.reps,
-                sets: Number(s.sets),
-                weight: Number(s.weight) || 0,
-                workoutId: newWorkoutId
-            });
+        for (let i = 0; i < sets.length; i++) {
+            const s = sets[i];
+            if (s.exercise && s.reps && s.sets) {
+                await db.data.add({
+                    exercise: s.exercise,
+                    reps: s.reps,
+                    sets: Number(s.sets),
+                    weight: Number(s.weight) || 0,
+                    workoutId: newWorkoutId,
+                    order: i // Add order field for new workouts too
+                });
+            }
         }
 
         return newWorkoutId;
@@ -86,7 +93,20 @@ export const refreshWorkoutData = async () => {
     const data = await db.data.toArray();
     const setsByWorkout = {};
     workouts.forEach(w => {
-        setsByWorkout[w.id] = data.filter(s => s.workoutId === w.id);
+        // Sort exercises by order field, then by id for backwards compatibility
+        setsByWorkout[w.id] = data
+            .filter(s => s.workoutId === w.id)
+            .sort((a, b) => {
+                // If both have order field, sort by order
+                if (a.order !== undefined && b.order !== undefined) {
+                    return a.order - b.order;
+                }
+                // If only one has order, put it first/last appropriately
+                if (a.order !== undefined) return -1;
+                if (b.order !== undefined) return 1;
+                // Fallback to id for old data without order field
+                return (a.id || 0) - (b.id || 0);
+            });
     });
     return { workouts, setsByWorkout };
 };

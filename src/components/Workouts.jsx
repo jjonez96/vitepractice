@@ -23,8 +23,6 @@ const Workouts = () => {
     const [originalDate, setOriginalDate] = useState("");
     const [originalNote, setOriginalNote] = useState("");
 
-
-
     const { toast, showToast, hideToast } = useToast();
     const { data, setData, handleNumberInputs, addExercise, removeSet, editingRowIdx, setEditingRowIdx } = useExerciseInputs();
     const {
@@ -51,20 +49,23 @@ const Workouts = () => {
     // Start editing a workout
     const handleEdit = (workoutId) => {
         setEditingWorkoutId(workoutId);
-        const currentSets = setsByWorkout[workoutId]?.map(s => ({ ...s })) || [];
+        let currentSets = [];
+        if (setsByWorkout[workoutId]) {
+            currentSets = setsByWorkout[workoutId].map(s => ({ ...s }));
+        }
 
         setData(currentSets);
-        setOriginalData([...currentSets]); // Store original data for comparison
-        setEditingRowIdx(null); // Reset row editing when starting workout edit
-        // Load note for this workout (date will be set automatically on save)
+        setOriginalData([...currentSets]);
+        setEditingRowIdx(null);
         const workout = workouts.find(w => w.id === workoutId);
-        const workoutNote = workout?.note || "";
-        const workoutDate = workout?.date || "";
-
-        setNoteByWorkout(prev => ({ ...prev, [workoutId]: workoutNote }));
-        setEditDate(workoutDate);
-        setOriginalDate(workoutDate);
-        setOriginalNote(workoutNote);
+        if (workout) {
+            const workoutNote = workout.note || "";
+            const workoutDate = workout.date || "";
+            setNoteByWorkout(prev => ({ ...prev, [workoutId]: workoutNote }));
+            setEditDate(workoutDate);
+            setOriginalDate(workoutDate);
+            setOriginalNote(workoutNote);
+        }
     };
 
     const handleRowClick = (rowIdx) => {
@@ -108,6 +109,24 @@ const Workouts = () => {
         setConfirmDeleteId(null);
     };
 
+    const moveExercise = (index, direction, e) => {
+        e.stopPropagation();
+        const newIndex = index + direction;
+
+        // Check bounds
+        if (newIndex < 0 || newIndex >= data.length) return;
+
+        const newData = [...data];
+        [newData[index], newData[newIndex]] = [newData[newIndex], newData[index]];
+        setData(newData);
+
+        // Update editing index if needed
+        if (editingRowIdx === index) {
+            setEditingRowIdx(newIndex);
+        } else if (editingRowIdx === newIndex) {
+            setEditingRowIdx(index);
+        }
+    };
     const handleSave = async () => {
         try {
             await saveWorkout({
@@ -244,6 +263,8 @@ const Workouts = () => {
                 handleAddExercise={handleAddExercise}
                 handleSave={handleSave}
                 setConfirmDeleteId={setConfirmDeleteId}
+                moveExercise={moveExercise}
+                workoutHistory={workouts}
             />
 
             <DeleteConfirmationModal
